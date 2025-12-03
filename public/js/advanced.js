@@ -1,5 +1,6 @@
 // Global variables
 let teamData = null;
+let charts = {};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,8 +18,11 @@ async function loadAdvancedAnalytics() {
 
         calculateTeamHealthScore();
         updateBenchmarking();
+        renderTrajectoryChart();
+        renderRiskBubbleChart();
         calculateForecast();
         analyzeSleepDebt();
+        renderEmployeeInsights();
         generateRecommendations();
     } catch (error) {
         console.error('Error loading data:', error);
@@ -109,6 +113,187 @@ function updateBenchmarking() {
     });
 }
 
+// Trajectory chart (WHO-5, stress, sleep)
+function renderTrajectoryChart() {
+    if (!teamData) return;
+
+    const ctxEl = document.getElementById('trajectoryChart');
+    if (!ctxEl) return;
+
+    const months = ['august', 'september', 'october', 'november'];
+    const labels = ['Серп', 'Вер', 'Жовт', 'Лист'];
+    const averages = teamData.teamAverages;
+
+    const who5 = months.map(m => averages[m].who5);
+    const stressRaw = months.map(m => averages[m].stressLevel);
+    const stress = stressRaw.map(v => (v / 40) * 100);
+    const sleepRaw = months.map(m => averages[m].sleepDuration);
+    const sleep = sleepRaw.map(v => (v / 9) * 100);
+
+    if (charts.trajectory) charts.trajectory.destroy();
+
+    const ctx = ctxEl.getContext('2d');
+    const gradWho = ctx.createLinearGradient(0, 0, 0, 260);
+    gradWho.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+    gradWho.addColorStop(1, 'rgba(99, 102, 241, 0.05)');
+
+    const gradSleep = ctx.createLinearGradient(0, 0, 0, 260);
+    gradSleep.addColorStop(0, 'rgba(34, 197, 94, 0.25)');
+    gradSleep.addColorStop(1, 'rgba(34, 197, 94, 0.05)');
+
+    charts.trajectory = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'WHO-5',
+                    data: who5,
+                    borderColor: '#a5b4fc',
+                    backgroundColor: gradWho,
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
+                },
+                {
+                    label: 'Стрес (0-40 → 0-100)',
+                    data: stress,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2,
+                    borderDash: [6, 6]
+                },
+                {
+                    label: 'Сон (год → 0-100)',
+                    data: sleep,
+                    borderColor: '#22c55e',
+                    backgroundColor: gradSleep,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1.8,
+            plugins: {
+                legend: {
+                    labels: { color: '#e2e8f0' }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const idx = context.dataIndex;
+                            if (context.dataset.label.includes('WHO-5')) {
+                                return 'WHO-5: ' + who5[idx];
+                            }
+                            if (context.dataset.label.includes('Стрес')) {
+                                return 'Стрес: ' + stressRaw[idx] + ' / 40';
+                            }
+                            return 'Сон: ' + sleepRaw[idx] + ' год';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMax: 100,
+                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
+                    ticks: { color: '#cbd5e1' }
+                },
+                x: {
+                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
+                    ticks: { color: '#cbd5e1' }
+                }
+            }
+        }
+    });
+}
+
+// Stress vs burnout matrix
+function renderRiskBubbleChart() {
+    if (!teamData) return;
+
+    const ctxEl = document.getElementById('riskBubbleChart');
+    if (!ctxEl) return;
+
+    if (charts.riskBubble) charts.riskBubble.destroy();
+
+    const ctx = ctxEl.getContext('2d');
+    const colors = {
+        high: { fill: 'rgba(239, 68, 68, 0.65)', border: '#ef4444' },
+        medium: { fill: 'rgba(251, 191, 36, 0.55)', border: '#f59e0b' },
+        low: { fill: 'rgba(34, 197, 94, 0.55)', border: '#22c55e' },
+        positive: { fill: 'rgba(139, 92, 246, 0.55)', border: '#8b5cf6' }
+    };
+
+    const points = teamData.employees.map(emp => ({
+        x: emp.metrics.stressLevel,
+        y: emp.metrics.mbi,
+        r: Math.max(8, emp.metrics.phq9 + 4),
+        name: emp.name,
+        position: emp.position,
+        risk: emp.riskLevel || 'medium'
+    }));
+
+    charts.riskBubble = new Chart(ctx, {
+        type: 'bubble',
+        data: {
+            datasets: [{
+                label: 'Ризики',
+                data: points,
+                backgroundColor: points.map(p => (colors[p.risk]?.fill || colors.medium.fill)),
+                borderColor: points.map(p => (colors[p.risk]?.border || colors.medium.border)),
+                borderWidth: 2,
+                hoverBorderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1.2,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const raw = context.raw;
+                            return [
+                                raw.name + ' · ' + raw.position,
+                                'Стрес: ' + raw.x + '/40',
+                                'MBI: ' + raw.y.toFixed(1) + '%',
+                                'PHQ-9: ' + (raw.r - 4)
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Стрес (0-40)', color: '#cbd5e1' },
+                    beginAtZero: true,
+                    max: 40,
+                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
+                    ticks: { color: '#cbd5e1' }
+                },
+                y: {
+                    title: { display: true, text: 'Вигорання (MBI %)', color: '#cbd5e1' },
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
+                    ticks: { color: '#cbd5e1' }
+                }
+            },
+            animation: { duration: 900, easing: 'easeOutQuart' }
+        }
+    });
+}
+
 // Calculate Forecast
 function calculateForecast() {
     if (!teamData) return;
@@ -173,7 +358,9 @@ function analyzeSleepDebt() {
     document.getElementById('atRiskCount').textContent = atRisk;
 
     const ctx = document.getElementById('sleepDebtChart').getContext('2d');
-    new Chart(ctx, {
+    if (charts.sleepDebt) charts.sleepDebt.destroy();
+
+    charts.sleepDebt = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: debtData.map(d => d.name.split(' ')[0]),
@@ -228,98 +415,250 @@ function analyzeSleepDebt() {
     });
 }
 
+// Deep employee insights
+function renderEmployeeInsights() {
+    if (!teamData) return;
+
+    const grid = document.getElementById('insightGrid');
+    if (!grid) return;
+
+    const employees = teamData.employees;
+
+    const riskSorted = [...employees].sort((a, b) =>
+        (b.metrics.mbi + b.metrics.phq9) - (a.metrics.mbi + a.metrics.phq9)
+    );
+    const topRiskNames = riskSorted.slice(0, 2).map(e =>
+        `${e.name.split(' ')[0]} (MBI ${e.metrics.mbi.toFixed(0)}%, PHQ-9 ${e.metrics.phq9})`
+    ).join(', ');
+
+    const improvements = employees.map(emp => {
+        const oct = emp.history?.october?.who5 ?? emp.metrics.who5;
+        const nov = emp.history?.november?.who5 ?? emp.metrics.who5;
+        return { name: emp.name, delta: nov - oct };
+    }).sort((a, b) => b.delta - a.delta);
+
+    const topRecovery = improvements.filter(i => i.delta > 0).slice(0, 2)
+        .map(i => `${i.name.split(' ')[0]} (+${i.delta.toFixed(0)} WHO-5)`).join(', ');
+
+    const declines = improvements.filter(i => i.delta < 0).slice(0, 2)
+        .map(i => `${i.name.split(' ')[0]} (${i.delta.toFixed(0)})`).join(', ');
+
+    const sleepDebt = employees.map(emp => {
+        const debt = Math.max(0, (7.5 - emp.metrics.sleepDuration) * 7);
+        return { name: emp.name, debt };
+    }).sort((a, b) => b.debt - a.debt).slice(0, 2);
+
+    const balanced = [...employees].sort((a, b) =>
+        b.metrics.workLifeBalance - a.metrics.workLifeBalance
+    ).slice(0, 2);
+
+    const cards = [
+        {
+            pill: 'CRITICAL',
+            title: 'Терміновий фокус 1:1',
+            body: topRiskNames || 'Немає червоних прапорців цього тижня.',
+            actions: 'Заплануй 12-хв check-in, зніми 2 блокери, підтвердь доступ до психолога/коуча і домовся про follow-up через 7 днів.'
+        },
+        {
+            pill: 'RECOVERY',
+            title: 'Найбільше відновлення',
+            body: topRecovery || 'Динаміка стабільна, різких підйомів не зафіксовано.',
+            actions: topRecovery
+                ? 'Запитай, що спрацювало, і масштабуй ці практики на команду (peer sharing на 15 хв).'
+                : 'Підтримуй стабільний ритм: короткі 1:1 раз на 2 тижні для фіксації настрою.'
+        },
+        {
+            pill: 'DROP',
+            title: 'Негативна динаміка',
+            body: declines || 'Немає різких спадів за місяць.',
+            actions: 'Перевір навантаження та пріоритети, підключи buddy з еталонного балансу й зафіксуй одну зміну в календарі.'
+        },
+        {
+            pill: 'SLEEP',
+            title: 'Борг сну та енергія',
+            body: sleepDebt.length
+                ? sleepDebt.map(d => `${d.name.split(' ')[0]} (+${d.debt.toFixed(0)} год/тижд)`).join(', ')
+                : 'Борг сну в нормі.',
+            actions: 'Фіксуємо правило «без пінгів після 19:00», гнучкий старт дня та 2 дні з пізнішим стендапом для групи ризику.'
+        },
+        {
+            pill: 'BALANCE',
+            title: 'Еталонний баланс',
+            body: balanced.map(b =>
+                `${b.name.split(' ')[0]} (баланс ${b.metrics.workLifeBalance}/10, стрес ${b.metrics.stressLevel}/40)`
+            ).join(', '),
+            actions: 'Запроси їх як buddy для колег у ризику; задокументуй їхні ритуали відновлення в внутрішньому гайді.'
+        }
+    ];
+
+    grid.innerHTML = '';
+    cards.forEach(card => {
+        const el = document.createElement('div');
+        el.className = 'insight-card lift';
+        el.innerHTML = `
+            <span class="insight-pill">★ ${card.pill}</span>
+            <div class="insight-title">${card.title}</div>
+            <div class="insight-body">${card.body}</div>
+            <div class="insight-actions">${card.actions}</div>
+        `;
+        grid.appendChild(el);
+    });
+}
+
 // Generate Recommendations
 function generateRecommendations() {
     if (!teamData) return;
 
     const employees = teamData.employees;
-    const recommendations = [];
-
-    employees.forEach(emp => {
-        const m = emp.metrics;
-        const firstName = emp.name.split(' ')[0];
-
-        if (m.phq9 > 10) {
-            recommendations.push({
-                employee: emp.name,
-                category: '💚 Підтримка',
-                message: 'Привіт ' + firstName + ',\n\nПомітив(ла), що останнім часом може бути важко. Нагадую, що у нас є безкоштовна конфіденційна підтримка психолога. Можна записатися анонімно через HR-портал.\n\nТи не один/одна - піклуємося про тебе! 💙',
-                action: 'Запропонувати консультацію психолога'
-            });
-        }
-
-        if (m.sleepDuration < 6) {
-            recommendations.push({
-                employee: emp.name,
-                category: '😴 Сон',
-                message: 'Привіт ' + firstName + '!\n\nПомітив(ла), що твій графік сну останнім часом скоротився. Якісний сон - основа продуктивності та здоров\'я.\n\nПропоную:\n- Спробуй встановити будильник на годину раніше лягання\n- Використовуй додаток для медитації (Calm/Headspace)\n- Якщо потрібно - можна обговорити гнучкий графік\n\nПодбаємо про це разом! 🌙',
-                action: 'Обговорити режим дня та навантаження'
-            });
-        }
-
-        if (m.workLifeBalance < 5) {
-            recommendations.push({
-                employee: emp.name,
-                category: '⚖️ Баланс',
-                message: 'Привіт ' + firstName + ',\n\nПомічаю, що робота забирає багато часу останнім часом. Важливо знаходити час для себе та близьких.\n\nДавай обговоримо:\n- Чи можна перерозподілити завдання?\n- Може потрібна допомога в команді?\n- Спробуй використати всі дні відпустки\n\nТи цінний член команди, і твоє благополуччя важливе! 🌟',
-                action: 'Обговорити навантаження та приоритети'
-            });
-        }
-
-        if (m.gad7 > 10) {
-            recommendations.push({
-                employee: emp.name,
-                category: '💚 Підтримка',
-                message: 'Привіт ' + firstName + ',\n\nЗверни увагу на техніки керування стресом:\n- Дихальні вправи 4-7-8\n- 5-хвилинні перерви кожні 90 хв\n- Прогулянки на свіжому повітрі\n\nЯкщо хочеш поговорити - завжди відкритий для розмови. Можемо також організувати консультацію з фахівцем.\n\nРазом впораємося! 💪',
-                action: 'Запропонувати антистресові практики'
-            });
-        }
-
-        if (m.workLifeBalance < 5 && m.stressLevel > 15) {
-            recommendations.push({
-                employee: emp.name,
-                category: '⏰ Переробки',
-                message: 'Привіт ' + firstName + ',\n\nПомічаю ознаки перевантаження. Важливо пам\'ятати:\n- Твоє здоров\'я важливіше дедлайнів\n- Переробки не роблять тебе продуктивнішим\n- Якість важливіша за кількість годин\n\nДавай знайдемо баланс разом. Готовий обговорити пріоритети?\n\nТвоє благополуччя - наш пріоритет! 🎯',
-                action: 'Терміново обговорити робоче навантаження'
-            });
-        }
-    });
+    const plans = employees.map(buildRecommendationPlan).filter(Boolean);
 
     const grid = document.getElementById('recommendationsGrid');
     grid.innerHTML = '';
 
-    if (recommendations.length === 0) {
+    if (plans.length === 0) {
         grid.innerHTML = '<p style="color: var(--text-tertiary); text-align: center; padding: 2rem;">Всі показники в нормі! 🎉</p>';
         return;
     }
 
-    recommendations.forEach(rec => {
+    plans.forEach(plan => {
+        const kitId = 'call-kit-' + plan.id;
         const card = document.createElement('div');
-        card.className = 'recommendation-card';
-        
-        const escapedMessage = rec.message.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-        
-        card.innerHTML = '<div class="rec-header">' +
-            '<span class="rec-category">' + rec.category + '</span>' +
-            '<strong>' + rec.employee + '</strong>' +
-            '</div>' +
-            '<div class="rec-message">' + rec.message.replace(/\n/g, '<br>') + '</div>' +
-            '<div class="rec-actions">' +
-            '<button class="copy-btn" onclick="copyToClipboard(`' + escapedMessage + '`)">📱 Копіювати для Telegram</button>' +
-            '<span class="rec-action">' + rec.action + '</span>' +
-            '</div>';
-        
+        card.className = 'recommendation-card lift';
+
+        card.innerHTML = `
+            <div class="rec-header">
+                <div>
+                    <span class="rec-category">${plan.category}</span>
+                    <div class="rec-insight">${plan.subtitle}</div>
+                </div>
+                <strong>${plan.employee}</strong>
+            </div>
+            <div class="rec-message">${plan.message}</div>
+            <div class="rec-actions">
+                <button class="copy-btn" onclick="toggleCallKit('${kitId}')">План 1:1 (${plan.duration} хв)</button>
+                <span class="rec-action">${plan.action}</span>
+            </div>
+            <div class="call-kit" id="${kitId}">
+                ${plan.callKit}
+            </div>
+        `;
+
         grid.appendChild(card);
     });
 }
 
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Текст скопійовано в буфер обміну!');
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Помилка копіювання. Спробуйте ще раз.');
-    });
+function buildRecommendationPlan(emp) {
+    const m = emp.metrics;
+    const focusAreas = [];
+
+    if (m.phq9 > 10 || m.gad7 > 10) focusAreas.push('mood');
+    if (m.mbi > 35 || m.stressLevel > 17) focusAreas.push('burnout');
+    if (m.sleepDuration < 6.5 || m.sleepQuality < 6) focusAreas.push('sleep');
+    if (m.workLifeBalance < 6) focusAreas.push('load');
+
+    const who5Delta = (emp.history?.november?.who5 ?? m.who5) - (emp.history?.october?.who5 ?? m.who5);
+    if (who5Delta >= 15) focusAreas.push('recovery');
+
+    if (focusAreas.length === 0) return null;
+
+    const severity = focusAreas.some(a => a === 'burnout' || a === 'mood') ? 'risk'
+        : focusAreas.includes('recovery') && focusAreas.length === 1 ? 'positive'
+        : 'focus';
+
+    const category = severity === 'risk' ? '🚨 Ризик 1:1'
+        : severity === 'positive' ? '🌟 Масштабувати успіх'
+        : '🛠 Профілактика';
+
+    const triggers = [];
+    if (focusAreas.includes('burnout')) triggers.push(`MBI ${m.mbi.toFixed(0)}% + стрес ${m.stressLevel}/40`);
+    if (focusAreas.includes('mood')) triggers.push(`PHQ-9 ${m.phq9}/27, GAD-7 ${m.gad7}/21`);
+    if (focusAreas.includes('sleep')) triggers.push(`сон ${m.sleepDuration} год, якість ${m.sleepQuality}/10`);
+    if (focusAreas.includes('load')) triggers.push(`баланс ${m.workLifeBalance}/10`);
+    if (focusAreas.includes('recovery')) triggers.push(`відновлення WHO-5 +${who5Delta.toFixed(0)}`);
+
+    const message = `
+        <div class="rec-insight">Тригери: ${triggers.join(' · ')}</div>
+        <div>Фокус 1:1: ${focusAreas.includes('recovery') ? 'закріпити успіх і масштабувати на інших' : 'прибрати джерела стресу, відновити сон та баланс'}</div>
+    `.trim();
+
+    const action = severity === 'risk'
+        ? 'Признач 1:1 протягом 48 годин та зафіксуй 2 зміни'
+        : 'Провести 1:1 цього тижня з чітким 7-денним планом';
+
+    return {
+        id: emp.id,
+        employee: emp.name,
+        category,
+        subtitle: `Стрес ${m.stressLevel}/40 · Сон ${m.sleepDuration.toFixed(1)} год · Баланс ${m.workLifeBalance}/10`,
+        message,
+        action,
+        duration: severity === 'risk' ? 15 : 12,
+        callKit: buildCallKit(emp, focusAreas, who5Delta)
+    };
+}
+
+function buildCallKit(emp, focusAreas, who5Delta) {
+    const firstName = emp.name.split(' ')[0];
+    const m = emp.metrics;
+
+    const questions = [
+        'Як ти зараз по шкалі 0-10?',
+        'Що забирає найбільше енергії цього тижня?',
+        'Що можемо прибрати/делегувати вже зараз?',
+        'Яка одна звичка допоможе відновитись цього тижня?'
+    ];
+
+    if (focusAreas.includes('sleep')) questions.push('Що заважає лягати раніше? Як команда може це підтримати?');
+    if (focusAreas.includes('load')) questions.push('Які задачі вигоряють найбільше і не дають цінності?');
+    if (focusAreas.includes('recovery') && who5Delta > 0) questions.push(`Що дало +${who5Delta.toFixed(0)} до WHO-5? Як це повторити?`);
+
+    const uniqueQuestions = [...new Set(questions)];
+
+    const microActions = [];
+    if (focusAreas.includes('burnout')) microActions.push('Вилучити 1 не-критичний мітинг і додати 2х2 год фокусу без пінгів.');
+    if (focusAreas.includes('mood')) microActions.push('Запропонувати консультацію психолога/коуча з конкретним слотом у календарі.');
+    if (focusAreas.includes('sleep')) microActions.push('2 вечори без робочих чатів після 19:00 + пізній стендап 1 раз на тиждень.');
+    if (focusAreas.includes('load')) microActions.push('Перерозподілити 1 задачку на колегу та заморозити 1 low-prio до наступного спринту.');
+    if (focusAreas.includes('recovery')) microActions.push('Задокументувати практику, яка спрацювала, і поділитись на тім-міті (5 хв).');
+
+    const blockers = [];
+    if (focusAreas.includes('burnout')) blockers.push('емоційне виснаження');
+    if (focusAreas.includes('sleep')) blockers.push('недосип');
+    if (focusAreas.includes('load')) blockers.push('дисбаланс навантаження');
+    if (!blockers.length && focusAreas.includes('recovery')) blockers.push('закріплення прогресу');
+
+    return `
+        <h4>Флоу 1:1 для ${firstName}</h4>
+        <div class="rec-insight">Фокус: ${blockers.join(' • ')}</div>
+        <div class="call-kit-grid">
+            <div class="call-block"><strong>12-15 хв</strong>
+                <ul>
+                    <li>1 хв: нормалізуй і запроси чесність.</li>
+                    <li>3 хв: відзеркаль дані (стрес ${m.stressLevel}/40, MBI ${m.mbi.toFixed(0)}%, сон ${m.sleepDuration} год).</li>
+                    <li>5 хв: досліджуй корінь проблеми питаннями.</li>
+                    <li>3-4 хв: разом оберіть 1-2 зміни на тиждень.</li>
+                    <li>1 хв: зафіксуй наступний чекпойнт у календарі.</li>
+                </ul>
+            </div>
+            <div class="call-block"><strong>Питання</strong>
+                <ul>${uniqueQuestions.map(q => '<li>' + q + '</li>').join('')}</ul>
+            </div>
+            <div class="call-block"><strong>Домовленості</strong>
+                <ul>
+                    <li>Записати рішення прямо під час дзвінка.</li>
+                    <li>Follow-up через 7 днів з конкретною метрикою (сон, стрес або WHO-5).</li>
+                    <li>Buddy/коуч: визначити контакт і час.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="micro-actions"><strong>Мікродії на 7 днів:</strong> ${microActions.join(' • ') || 'Залишаємо стабільний режим; відстежуємо сон та настрій.'}</div>
+    `;
+}
+
+function toggleCallKit(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('open');
 }
 
 function handleLogout() {

@@ -18,6 +18,26 @@
             </nav>
         </header>
 
+        <!-- Momentum & Risks -->
+        <section class="momentum-section">
+            <div class="section-heading">
+                <h2 class="section-title">Динаміка та ризики</h2>
+                <p class="section-subtitle">Живі тренди команди, ранні тригери вигорання та опорні точки для 1:1</p>
+            </div>
+            <div class="momentum-grid">
+                <div class="chart-card lift">
+                    <div class="chart-title">Траєкторія благополуччя</div>
+                    <canvas id="trajectoryChart"></canvas>
+                    <p class="chart-note">WHO-5, стрес і сон нормовані до 100 для швидкого порівняння</p>
+                </div>
+                <div class="chart-card lift">
+                    <div class="chart-title">Матриця ризиків 1:1</div>
+                    <canvas id="riskBubbleChart"></canvas>
+                    <div class="chart-note">Розмір кола = PHQ-9, X = стрес, Y = MBI. Колір = рівень ризику.</div>
+                </div>
+            </div>
+        </section>
+
         <!-- Team Health Score -->
         <section class="health-score-section">
             <h2 class="section-title">Team Health Score</h2>
@@ -155,6 +175,17 @@
             </div>
         </section>
 
+        <!-- Deep Employee Insights -->
+        <section class="insights-section">
+            <div class="section-heading">
+                <h2 class="section-title">Ключові інсайти по людям</h2>
+                <p class="section-subtitle">Топ-ризики, відновлення та еталонні практики, які варто масштабувати</p>
+            </div>
+            <div class="insight-grid" id="insightGrid">
+                <!-- Filled by JavaScript -->
+            </div>
+        </section>
+
         <!-- ROI Calculator -->
         <section class="roi-section">
             <h2 class="section-title">ROI Calculator - Потенційна економія</h2>
@@ -180,7 +211,10 @@
 
         <!-- Personalized Recommendations -->
         <section class="recommendations-section">
-            <h2 class="section-title">Персоналізовані рекомендації</h2>
+            <div class="section-heading">
+                <h2 class="section-title">1:1 плейбуки та чіткі наступні кроки</h2>
+                <p class="section-subtitle">Структуровані сценарії дзвінків, мікродії на 7 днів і контрольні питання з світових практик коучингу</p>
+            </div>
             <div class="recommendations-grid" id="recommendationsGrid">
                 <!-- Filled by JavaScript -->
             </div>
@@ -188,7 +222,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>&copy; 2024 TeamPulse Mindguard AI. Всі права захищені.</p>
+            <p>&copy; 2025 TeamPulse Mindguard AI. Всі права захищені.</p>
         </footer>
     </div>
 
