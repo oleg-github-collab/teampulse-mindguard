@@ -157,14 +157,14 @@
                     <thead>
                         <tr>
                             <th>Співробітник</th>
-                            <th>WHO-5</th>
-                            <th>PHQ-9</th>
-                            <th>GAD-7</th>
-                            <th>MBI (%)</th>
-                            <th>Сон (год)</th>
-                            <th>Якість сну</th>
-                            <th>Баланс</th>
-                            <th>Стрес</th>
+                            <th title="WHO-5: 0-100, <50 — ризик низького благополуччя, <28 — ймовірна депресія">WHO-5</th>
+                            <th title="PHQ-9: 0-27, >10 — помірна/висока депресивна симптоматика">PHQ-9</th>
+                            <th title="GAD-7: 0-21, >10 — помірна/висока тривожність">GAD-7</th>
+                            <th title="MBI: 0-100%, >40% — підвищений ризик вигорання">MBI (%)</th>
+                            <th title="Тривалість сну: ціль 7-9 годин">Сон (год)</th>
+                            <th title="Якість сну: 1-10, <6 — погіршення">Якість сну</th>
+                            <th title="Баланс: 1-10, <6 — дисбаланс">Баланс</th>
+                            <th title="Стрес: 0-40, >20 — підвищений">Стрес</th>
                             <th>Загальний ризик</th>
                         </tr>
                     </thead>
@@ -229,6 +229,16 @@
         let currentMonth = 11; // November - latest month
         let teamData = null;
         let charts = {};
+        const METRIC_HINTS = {
+            who5: "WHO-5: 0-100, <50 — ризик низького благополуччя",
+            phq9: "PHQ-9: 0-27, >10 — помірна/висока депресивна симптоматика",
+            gad7: "GAD-7: 0-21, >10 — помірна/висока тривожність",
+            mbi: "MBI: 0-100%, >40% — підвищений ризик вигорання",
+            sleepDuration: "Тривалість сну: ціль 7-9 год",
+            sleepQuality: "Якість сну: 1-10, <6 — погіршення",
+            workLifeBalance: "Баланс: 1-10, <6 — дисбаланс",
+            stressLevel: "Стрес: 0-40, >20 — підвищений"
+        };
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
@@ -382,6 +392,7 @@
                     datasets: [
                         {
                             label: 'WHO-5 Благополуччя',
+                            metricKey: 'who5',
                             data: allMonths.map(m => m.averages.who5),
                             borderColor: '#22c55e',
                             backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -391,6 +402,7 @@
                         },
                         {
                             label: 'PHQ-9 Депресія',
+                            metricKey: 'phq9',
                             data: allMonths.map(m => m.averages.phq9),
                             borderColor: '#f59e0b',
                             backgroundColor: 'rgba(251, 191, 36, 0.1)',
@@ -400,6 +412,7 @@
                         },
                         {
                             label: 'GAD-7 Тривожність',
+                            metricKey: 'gad7',
                             data: allMonths.map(m => m.averages.gad7),
                             borderColor: '#ef4444',
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -409,6 +422,7 @@
                         },
                         {
                             label: 'MBI Вигорання (%)',
+                            metricKey: 'mbi',
                             data: allMonths.map(m => m.averages.mbi),
                             borderColor: '#8b5cf6',
                             backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -431,7 +445,14 @@
                         },
                         tooltip: {
                             mode: 'index',
-                            intersect: false
+                            intersect: false,
+                            callbacks: {
+                                label: (context) => {
+                                    const key = context.dataset.metricKey;
+                                    const hint = METRIC_HINTS[key] || '';
+                                    return `${context.dataset.label}: ${context.parsed.y}${hint ? ' (' + hint + ')' : ''}`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -724,35 +745,35 @@
             // Current metrics
             const metricsHtml = `
                 <div class="modal-metric">
-                    <span class="metric-label">WHO-5:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.who5}">WHO-5:</span>
                     <span class="metric-value ${getScoreClass('who5', employee.metrics.who5)}">${employee.metrics.who5}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">PHQ-9:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.phq9}">PHQ-9:</span>
                     <span class="metric-value ${getScoreClass('phq9', employee.metrics.phq9)}">${employee.metrics.phq9}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">GAD-7:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.gad7}">GAD-7:</span>
                     <span class="metric-value ${getScoreClass('gad7', employee.metrics.gad7)}">${employee.metrics.gad7}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">MBI:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.mbi}">MBI:</span>
                     <span class="metric-value ${getScoreClass('mbi', employee.metrics.mbi)}">${employee.metrics.mbi.toFixed(1)}%</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">Сон:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.sleepDuration}">Сон:</span>
                     <span class="metric-value ${getScoreClass('sleepDuration', employee.metrics.sleepDuration)}">${employee.metrics.sleepDuration.toFixed(1)} год</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">Якість сну:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.sleepQuality}">Якість сну:</span>
                     <span class="metric-value ${getScoreClass('sleepQuality', employee.metrics.sleepQuality)}">${employee.metrics.sleepQuality}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">Баланс:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.workLifeBalance}">Баланс:</span>
                     <span class="metric-value ${getScoreClass('workLifeBalance', employee.metrics.workLifeBalance)}">${employee.metrics.workLifeBalance}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label">Стрес:</span>
+                    <span class="metric-label" title="${METRIC_HINTS.stressLevel}">Стрес:</span>
                     <span class="metric-value ${getScoreClass('stressLevel', employee.metrics.stressLevel)}">${employee.metrics.stressLevel}</span>
                 </div>
             `;
@@ -790,6 +811,7 @@
                     datasets: [
                         {
                             label: 'WHO-5',
+                            metricKey: 'who5',
                             data: [history.august.who5, history.september.who5, history.october.who5, history.november.who5],
                             borderColor: '#22c55e',
                             tension: 0.4,
@@ -797,6 +819,7 @@
                         },
                         {
                             label: 'PHQ-9',
+                            metricKey: 'phq9',
                             data: [history.august.phq9, history.september.phq9, history.october.phq9, history.november.phq9],
                             borderColor: '#f59e0b',
                             tension: 0.4,
@@ -804,6 +827,7 @@
                         },
                         {
                             label: 'GAD-7',
+                            metricKey: 'gad7',
                             data: [history.august.gad7, history.september.gad7, history.october.gad7, history.november.gad7],
                             borderColor: '#ef4444',
                             tension: 0.4,
@@ -811,6 +835,7 @@
                         },
                         {
                             label: 'MBI',
+                            metricKey: 'mbi',
                             data: [history.august.mbi, history.september.mbi, history.october.mbi, history.november.mbi],
                             borderColor: '#8b5cf6',
                             tension: 0.4,
@@ -825,6 +850,15 @@
                         legend: {
                             labels: {
                                 color: '#e2e8f0'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const key = context.dataset.metricKey;
+                                    const hint = METRIC_HINTS[key] || '';
+                                    return `${context.dataset.label}: ${context.parsed.y}${hint ? ' (' + hint + ')' : ''}`;
+                                }
                             }
                         }
                     },

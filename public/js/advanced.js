@@ -15,6 +15,17 @@ const MONTH_LABELS = {
     june: 'Черв',
     july: 'Лип'
 };
+const METRIC_HINTS = {
+    who5: 'WHO-5: 0-100, <50 — ризик низького благополуччя',
+    phq9: 'PHQ-9: 0-27, >10 — помірна/висока депресивна симптоматика',
+    gad7: 'GAD-7: 0-21, >10 — помірна/висока тривожність',
+    mbi: 'MBI: 0-100%, >40% — підвищений ризик вигорання',
+    stress: 'Суб\'єктивний стрес: 0-40, >20 — підвищений',
+    sleep: 'Тривалість сну: ціль 7-9 год',
+    sleepQuality: 'Якість сну: 1-10, <6 — погіршення',
+    workLifeBalance: 'Баланс: 1-10, <6 — дисбаланс',
+    forecast: 'Прогноз базується на останніх двох місяцях'
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -147,13 +158,6 @@ function renderTrajectoryChart() {
     if (charts.trajectory) charts.trajectory.destroy();
 
     const ctx = ctxEl.getContext('2d');
-    const gradWho = ctx.createLinearGradient(0, 0, 0, 260);
-    gradWho.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
-    gradWho.addColorStop(1, 'rgba(99, 102, 241, 0.05)');
-
-    const gradSleep = ctx.createLinearGradient(0, 0, 0, 260);
-    gradSleep.addColorStop(0, 'rgba(34, 197, 94, 0.25)');
-    gradSleep.addColorStop(1, 'rgba(34, 197, 94, 0.05)');
 
     charts.trajectory = new Chart(ctx, {
         type: 'line',
@@ -164,7 +168,7 @@ function renderTrajectoryChart() {
                     label: 'WHO-5',
                     data: who5,
                     borderColor: '#a5b4fc',
-                    backgroundColor: gradWho,
+                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
                     fill: true,
                     tension: 0.4,
                     borderWidth: 3
@@ -183,7 +187,7 @@ function renderTrajectoryChart() {
                     label: 'Сон (год → 0-100)',
                     data: sleep,
                     borderColor: '#22c55e',
-                    backgroundColor: gradSleep,
+                    backgroundColor: 'rgba(34, 197, 94, 0.12)',
                     fill: true,
                     tension: 0.35,
                     borderWidth: 2
@@ -202,12 +206,12 @@ function renderTrajectoryChart() {
                         label: (context) => {
                             const idx = context.dataIndex;
                             if (context.dataset.label.includes('WHO-5')) {
-                                return 'WHO-5: ' + who5[idx];
+                                return 'WHO-5: ' + who5[idx] + ' (' + METRIC_HINTS.who5 + ')';
                             }
                             if (context.dataset.label.includes('Стрес')) {
-                                return 'Стрес: ' + stressRaw[idx] + ' / 40';
+                                return 'Стрес: ' + stressRaw[idx] + ' / 40 (' + METRIC_HINTS.stress + ')';
                             }
-                            return 'Сон: ' + sleepRaw[idx] + ' год';
+                            return 'Сон: ' + sleepRaw[idx] + ' год (' + METRIC_HINTS.sleep + ')';
                         }
                     }
                 }
@@ -238,9 +242,9 @@ function renderTrajectoryChart() {
     updateText('trajectoryComment', `Останній місяць (${labelFromKey(latestKey)}): WHO-5 ${who5[latestIdx].toFixed(1)}, сон ${sleepRaw[latestIdx].toFixed(1)} год, стрес ${stressRaw[latestIdx].toFixed(1)}/40. Δ vs ${labelFromKey(prevKey)}: WHO-5 ${(whoDelta>=0?'+':'') + whoDelta.toFixed(1)}, сон ${(sleepDelta>=0?'+':'') + sleepDelta.toFixed(1)} год, стрес ${(stressDelta>=0?'+':'') + stressDelta.toFixed(1)}.`);
 
     const modalMetrics = [
-        { label: 'WHO-5', value: who5[latestIdx].toFixed(1) + ` (${deltaText(whoDelta)})` },
-        { label: 'Сон (год)', value: sleepRaw[latestIdx].toFixed(1) + ` (${deltaText(sleepDelta)})` },
-        { label: 'Стрес (0-40)', value: stressRaw[latestIdx].toFixed(1) + ` (${deltaText(stressDelta)})` }
+        { key: 'who5', label: 'WHO-5', value: who5[latestIdx].toFixed(1) + ` (${deltaText(whoDelta)})` },
+        { key: 'sleep', label: 'Сон (год)', value: sleepRaw[latestIdx].toFixed(1) + ` (${deltaText(sleepDelta)})` },
+        { key: 'stress', label: 'Стрес (0-40)', value: stressRaw[latestIdx].toFixed(1) + ` (${deltaText(stressDelta)})` }
     ];
     fillMetricsGrid('trajectoryMetrics', modalMetrics);
     updateText('trajectorySummary', `Фокус: за останній місяць ${labelFromKey(latestKey)} змінились головні показники настрою, сну та стресу. Це базовий барометр команди на останню хвилю вимірювань.`);
@@ -304,14 +308,24 @@ function renderRiskBubbleChart() {
             },
             scales: {
                 x: {
-                    title: { display: true, text: 'Стрес (0-40)', color: '#cbd5e1' },
+                    title: {
+                        display: true,
+                        text: 'Рівень стресу (PSS) →',
+                        color: '#cbd5e1',
+                        font: { size: 14, weight: 'bold' }
+                    },
                     beginAtZero: true,
                     max: 40,
                     grid: { color: 'rgba(99, 102, 241, 0.1)' },
                     ticks: { color: '#cbd5e1' }
                 },
                 y: {
-                    title: { display: true, text: 'Вигорання (MBI %)', color: '#cbd5e1' },
+                    title: {
+                        display: true,
+                        text: 'Індекс вигорання (MBI %) ↑',
+                        color: '#cbd5e1',
+                        font: { size: 14, weight: 'bold' }
+                    },
                     beginAtZero: true,
                     max: 100,
                     grid: { color: 'rgba(99, 102, 241, 0.1)' },
@@ -330,10 +344,10 @@ function renderRiskBubbleChart() {
     updateText('riskComment', `Ризики: high ${counts.high || 0}, medium ${counts.medium || 0}, low ${counts.low || 0}. Найвищий ризик: ${topRisk?.name || '—'}.`);
 
     const modalMetrics = [
-        { label: 'High', value: counts.high || 0 },
-        { label: 'Medium', value: counts.medium || 0 },
-        { label: 'Low', value: counts.low || 0 },
-        { label: 'Найвищий ризик', value: topRisk ? `${topRisk.name} · MBI ${topRisk.y.toFixed(0)}%, стрес ${topRisk.x}/40` : '—' }
+        { key: 'mbi', label: 'High', value: counts.high || 0 },
+        { key: 'mbi', label: 'Medium', value: counts.medium || 0 },
+        { key: 'mbi', label: 'Low', value: counts.low || 0 },
+        { key: 'mbi', label: 'Найвищий ризик', value: topRisk ? `${topRisk.name} · MBI ${topRisk.y.toFixed(0)}%, стрес ${topRisk.x}/40` : '—' }
     ];
     fillMetricsGrid('riskMetrics', modalMetrics);
     updateText('riskSummary', 'Матриця поєднує стрес, вигорання та PHQ-9 як радіус, щоб за секунди визначити, кого брати на 1:1 першими.');
@@ -431,6 +445,7 @@ function analyzeSleepDebt() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: 'y',
             plugins: {
                 legend: {
                     labels: {
@@ -440,7 +455,6 @@ function analyzeSleepDebt() {
             },
             scales: {
                 y: {
-                    beginAtZero: true,
                     grid: {
                         color: 'rgba(99, 102, 241, 0.1)'
                     },
@@ -449,13 +463,12 @@ function analyzeSleepDebt() {
                     }
                 },
                 x: {
+                    beginAtZero: true,
                     grid: {
                         color: 'rgba(99, 102, 241, 0.1)'
                     },
                     ticks: {
-                        color: '#cbd5e1',
-                        maxRotation: 45,
-                        minRotation: 45
+                        color: '#cbd5e1'
                     }
                 }
             }
@@ -793,7 +806,7 @@ function fillMetricsGrid(id, metrics) {
     const grid = document.getElementById(id);
     if (!grid) return;
     grid.innerHTML = metrics.map(item =>
-        `<div class="modal-metric"><span class="metric-label">${item.label}</span><span class="metric-value">${item.value}</span></div>`
+        `<div class="modal-metric"><span class="metric-label" title="${METRIC_HINTS[item.key] || ''}">${item.label}</span><span class="metric-value">${item.value}</span></div>`
     ).join('');
 }
 

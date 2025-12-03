@@ -1402,3 +1402,132 @@ footer {
         max-height: 1400px;
     }
 }
+
+/* Playbooks Section */
+.playbooks-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.playbook-card {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(30, 41, 59, 0.3));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.playbook-employee-name {
+    color: var(--text-primary);
+    font-size: var(--font-lg);
+    margin-bottom: var(--spacing-xs);
+}
+
+.playbook-risk-level {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-sm);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--spacing-md);
+}
+
+.playbook-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.playbook-section h4 {
+    color: var(--text-tertiary);
+    font-size: var(--font-base);
+    margin-bottom: var(--spacing-sm);
+}
+
+.playbook-bullets,
+.playbook-microactions {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    padding-left: 1.5rem;
+}
+
+.playbook-bullets li,
+.playbook-microactions li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.playbook-bullets strong,
+.playbook-microactions strong {
+    color: var(--accent-light-indigo);
+}
+
+/* Risk Matrix Explanation */
+.risk-matrix-explanation {
+    background: rgba(99, 102, 241, 0.05);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.risk-matrix-explanation h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.matrix-legend {
+    display: flex;
+    gap: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.matrix-axes-explanation {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-primary);
+}
+
+.matrix-axes-explanation p {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-secondary);
+}
+
+.risk-matrix-insights {
+    background: rgba(99, 102, 241, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.risk-matrix-insights h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.risk-matrix-insights ul {
+    padding-left: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.risk-matrix-insights li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.insight-note {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-tertiary);
+}
