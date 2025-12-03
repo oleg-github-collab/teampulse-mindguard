@@ -18,80 +18,6 @@
             </nav>
         </header>
 
-        <!-- Momentum & Risks -->
-        <section class="momentum-section">
-            <div class="section-heading">
-                <h2 class="section-title">Динаміка та ризики</h2>
-                <p class="section-subtitle">Живі тренди команди, ранні тригери вигорання та опорні точки для 1:1</p>
-            </div>
-            <div class="momentum-grid">
-                <div class="chart-card lift">
-                    <div class="chart-title">Траєкторія благополуччя</div>
-                    <div class="chart-wrapper" style="position: relative; width: 100%; max-width: 650px; margin: 0 auto;">
-                        <div class="chart-container" style="position: relative; height: 280px;">
-                            <canvas id="trajectoryChart"></canvas>
-                        </div>
-                    </div>
-                    <p class="chart-note">WHO-5, стрес і сон нормовані до 100 для швидкого порівняння</p>
-                    <div class="chart-actions">
-                        <p class="chart-comment" id="trajectoryComment">Дані оновлюються...</p>
-                        <button class="detail-btn" onclick="openChartModal('trajectoryModal')">Детальніше</button>
-                    </div>
-                </div>
-                <div class="chart-card lift">
-                    <div class="chart-title">Матриця ризиків 1:1</div>
-
-                    <div class="risk-matrix-explanation">
-                        <h3>🎯 Навіщо ця матриця?</h3>
-                        <p>Матриця допомагає візуально ідентифікувати співробітників, які потребують найбільшої уваги.
-                        Чим правіше та вище знаходиться точка - тим вищий ризик вигорання та проблем з ментальним здоров'ям.</p>
-
-                        <div class="matrix-legend">
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background: #22c55e;"></span>
-                                <span>Низький ризик (все добре)</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background: #fbbf24;"></span>
-                                <span>Середній ризик (потребує моніторингу)</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot" style="background: #ef4444;"></span>
-                                <span>Високий ризик (термінова підтримка)</span>
-                            </div>
-                        </div>
-
-                        <div class="matrix-axes-explanation">
-                            <p><strong>Вісь X (Рівень стресу):</strong> Показує загальне навантаження та напругу</p>
-                            <p><strong>Вісь Y (Індекс вигорання):</strong> Показує емоційне виснаження</p>
-                            <p><strong>Розмір бульбашки:</strong> Рівень депресії (PHQ-9) - більша = більше занепокоєння</p>
-                        </div>
-                    </div>
-
-                    <div class="chart-wrapper" style="max-width: 700px; margin: 2rem auto;">
-                        <div class="chart-container" style="position: relative; height: 450px;">
-                            <canvas id="riskBubbleChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="risk-matrix-insights">
-                        <h4>📊 Що показує матриця:</h4>
-                        <ul>
-                            <li><strong>Червона зона (правий верхній кут):</strong> Високий стрес + високе вигорання = потребує негайної підтримки</li>
-                            <li><strong>Жовта зона (середина):</strong> Помірні показники = профілактичні заходи</li>
-                            <li><strong>Зелена зона (лівий нижній кут):</strong> Здорові показники = підтримувати поточну практику</li>
-                        </ul>
-                        <p class="insight-note">💡 <strong>Примітка:</strong> Розмір бульбашки показує рівень депресії - чим більша, тим більше потрібно уваги.</p>
-                    </div>
-
-                    <div class="chart-actions">
-                        <p class="chart-comment" id="riskComment">Дані оновлюються...</p>
-                        <button class="detail-btn" onclick="openChartModal('riskModal')">Детальніше</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Team Health Score -->
         <section class="health-score-section">
             <h2 class="section-title">Team Health Score</h2>
@@ -190,6 +116,76 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Charts - Full Width -->
+        <section class="charts-section">
+            <div class="section-heading">
+                <h2 class="section-title">Динаміка та ризики</h2>
+                <p class="section-subtitle">Живі тренди команди, ранні тригери вигорання та опорні точки для 1:1</p>
+            </div>
+
+            <!-- Trajectory Chart - FULL WIDTH -->
+            <div class="chart-card full-width lift">
+                <div class="chart-title">Траєкторія благополуччя</div>
+                <div class="chart-wrapper" style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="trajectoryChart"></canvas>
+                    </div>
+                </div>
+                <p class="chart-note">WHO-5, стрес і сон нормовані до 100 для швидкого порівняння</p>
+                <p class="chart-comment" id="trajectoryComment">Дані оновлюються...</p>
+            </div>
+
+            <!-- Risk Matrix - FULL WIDTH -->
+            <div class="chart-card full-width lift">
+                <div class="chart-title">Матриця ризиків 1:1</div>
+
+                <div class="risk-matrix-explanation">
+                    <h3>🎯 Навіщо ця матриця?</h3>
+                    <p>Матриця допомагає візуально ідентифікувати співробітників, які потребують найбільшої уваги.
+                    Чим правіше та вище знаходиться точка - тим вищий ризик вигорання та проблем з ментальним здоров'ям.</p>
+
+                    <div class="matrix-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #22c55e;"></span>
+                            <span>Низький ризик (все добре)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #fbbf24;"></span>
+                            <span>Середній ризик (потребує моніторингу)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444;"></span>
+                            <span>Високий ризик (термінова підтримка)</span>
+                        </div>
+                    </div>
+
+                    <div class="matrix-axes-explanation">
+                        <p><strong>Вісь X (Рівень стресу):</strong> Показує загальне навантаження та напругу</p>
+                        <p><strong>Вісь Y (Індекс вигорання):</strong> Показує емоційне виснаження</p>
+                        <p><strong>Розмір бульбашки:</strong> Рівень депресії (PHQ-9) - більша = більше занепокоєння</p>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                    <div class="chart-container" style="height: 500px;">
+                        <canvas id="riskBubbleChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="risk-matrix-insights">
+                    <h4>📊 Що показує матриця:</h4>
+                    <ul>
+                        <li><strong>Червона зона (правий верхній кут):</strong> Високий стрес + високе вигорання = потребує негайної підтримки</li>
+                        <li><strong>Жовта зона (середина):</strong> Помірні показники = профілактичні заходи</li>
+                        <li><strong>Зелена зона (лівий нижній кут):</strong> Здорові показники = підтримувати поточну практику</li>
+                    </ul>
+                    <p class="insight-note">💡 <strong>Примітка:</strong> Розмір бульбашки показує рівень депресії - чим більша, тим більше потрібно уваги.</p>
+                </div>
+
+                <p class="chart-comment" id="riskComment">Дані оновлюються...</p>
             </div>
         </section>
 

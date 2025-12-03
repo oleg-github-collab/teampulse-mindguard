@@ -1459,6 +1459,17 @@ footer {
     color: var(--accent-light-indigo);
 }
 
+/* Full width chart cards */
+.chart-card.full-width {
+    width: 100%;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Remove grid for charts section */
+.charts-section .momentum-grid {
+    display: block;
+}
+
 /* Risk Matrix Explanation */
 .risk-matrix-explanation {
     background: rgba(99, 102, 241, 0.05);

@@ -190,7 +190,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>&copy; 2024 TeamPulse Mindguard AI. Всі права захищені.</p>
+            <p>&copy; 2025 TeamPulse Mindguard AI. Всі права захищені.</p>
         </footer>
     </div>
 
@@ -745,35 +745,59 @@
             // Current metrics
             const metricsHtml = `
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.who5}">WHO-5:</span>
+                    <span class="metric-label">
+                        WHO-5:
+                        <span class="info-icon" data-tooltip="Індекс благополуччя ВООЗ (0-100). Оцінює позитивне психічне здоров'я за 5 питаннями. <50 - низьке благополуччя, потребує уваги.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('who5', employee.metrics.who5)}">${employee.metrics.who5}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.phq9}">PHQ-9:</span>
+                    <span class="metric-label">
+                        PHQ-9:
+                        <span class="info-icon" data-tooltip="Опитувальник здоров'я пацієнта (0-27). Вимірює тяжкість депресії. 0-4: мінімальна, 5-9: легка, 10-14: помірна, 15+: тяжка депресія.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('phq9', employee.metrics.phq9)}">${employee.metrics.phq9}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.gad7}">GAD-7:</span>
+                    <span class="metric-label">
+                        GAD-7:
+                        <span class="info-icon" data-tooltip="Шкала генералізованої тривожності (0-21). 0-4: мінімальна, 5-9: легка, 10-14: помірна, 15+: тяжка тривожність.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('gad7', employee.metrics.gad7)}">${employee.metrics.gad7}</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.mbi}">MBI:</span>
+                    <span class="metric-label">
+                        MBI:
+                        <span class="info-icon" data-tooltip="Опитувальник вигорання Маслач (0-100%). Вимірює емоційне виснаження. <25%: низький ризик, 25-50%: середній, >50%: високий ризик вигорання.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('mbi', employee.metrics.mbi)}">${employee.metrics.mbi.toFixed(1)}%</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.sleepDuration}">Сон:</span>
+                    <span class="metric-label">
+                        Сон:
+                        <span class="info-icon" data-tooltip="Середня тривалість сну (години). Рекомендовано 7-9 годин для дорослих. Менше 6 год - недостатній сон.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('sleepDuration', employee.metrics.sleepDuration)}">${employee.metrics.sleepDuration.toFixed(1)} год</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.sleepQuality}">Якість сну:</span>
-                    <span class="metric-value ${getScoreClass('sleepQuality', employee.metrics.sleepQuality)}">${employee.metrics.sleepQuality}</span>
+                    <span class="metric-label">
+                        Якість сну:
+                        <span class="info-icon" data-tooltip="Самооцінка якості сну (1-10). 7-10: хороша якість, 4-6: задовільна, <4: погана якість сну.">i</span>
+                    </span>
+                    <span class="metric-value ${getScoreClass('sleepQuality', employee.metrics.sleepQuality)}">${employee.metrics.sleepQuality}/10</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.workLifeBalance}">Баланс:</span>
-                    <span class="metric-value ${getScoreClass('workLifeBalance', employee.metrics.workLifeBalance)}">${employee.metrics.workLifeBalance}</span>
+                    <span class="metric-label">
+                        Work-Life:
+                        <span class="info-icon" data-tooltip="Баланс між роботою та особистим життям (1-10). 7-10: здоровий баланс, 4-6: потребує покращення, <4: критичний дисбаланс.">i</span>
+                    </span>
+                    <span class="metric-value ${getScoreClass('workLifeBalance', employee.metrics.workLifeBalance)}">${employee.metrics.workLifeBalance}/10</span>
                 </div>
                 <div class="modal-metric">
-                    <span class="metric-label" title="${METRIC_HINTS.stressLevel}">Стрес:</span>
+                    <span class="metric-label">
+                        Стрес:
+                        <span class="info-icon" data-tooltip="Рівень стресу за шкалою PSS (0-40). 0-13: низький, 14-26: помірний, 27-40: високий рівень стресу.">i</span>
+                    </span>
                     <span class="metric-value ${getScoreClass('stressLevel', employee.metrics.stressLevel)}">${employee.metrics.stressLevel}</span>
                 </div>
             `;

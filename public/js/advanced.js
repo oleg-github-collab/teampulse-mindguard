@@ -199,7 +199,7 @@ function renderTrajectoryChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    labels: { color: '#e2e8f0' }
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
