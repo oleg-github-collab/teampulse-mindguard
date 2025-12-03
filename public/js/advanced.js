@@ -158,9 +158,26 @@ function renderTrajectoryChart() {
     if (charts.trajectory) charts.trajectory.destroy();
 
     const ctx = ctxEl.getContext('2d');
+    const trajectoryBackdrop = {
+        id: 'trajectoryBackdrop',
+        beforeDraw: (chart) => {
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return;
+            const { left, right, top, bottom } = chartArea;
+            ctx.save();
+            const gradient = ctx.createLinearGradient(left, top, left, bottom);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.08)');
+            gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.02)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.05)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(left, top, right - left, bottom - top);
+            ctx.restore();
+        }
+    };
 
     charts.trajectory = new Chart(ctx, {
         type: 'line',
+        plugins: [trajectoryBackdrop],
         data: {
             labels,
             datasets: [
@@ -168,64 +185,91 @@ function renderTrajectoryChart() {
                     label: 'WHO-5',
                     data: who5,
                     borderColor: '#a5b4fc',
-                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.18)',
                     fill: true,
-                    tension: 0.4,
-                    borderWidth: 3
+                    tension: 0.28,
+                    borderWidth: 3,
+                    pointBorderColor: '#a5b4fc',
+                    pointHoverBackgroundColor: '#0f172a'
                 },
                 {
                     label: 'Стрес (0-40 → 0-100)',
                     data: stress,
                     borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     fill: true,
-                    tension: 0.35,
+                    tension: 0.22,
                     borderWidth: 2,
-                    borderDash: [6, 6]
+                    borderDash: [6, 6],
+                    pointBorderColor: '#f59e0b',
+                    pointHoverBackgroundColor: '#0f172a'
                 },
                 {
                     label: 'Сон (год → 0-100)',
                     data: sleep,
                     borderColor: '#22c55e',
-                    backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.14)',
                     fill: true,
-                    tension: 0.35,
-                    borderWidth: 2
+                    tension: 0.22,
+                    borderWidth: 2,
+                    pointBorderColor: '#22c55e',
+                    pointHoverBackgroundColor: '#0f172a'
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            layout: { padding: { top: 12, right: 18, bottom: 10, left: 6 } },
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    borderColor: 'rgba(99, 102, 241, 0.35)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#cbd5e1',
+                    cornerRadius: 10,
                     callbacks: {
                         label: (context) => {
                             const idx = context.dataIndex;
                             if (context.dataset.label.includes('WHO-5')) {
-                                return 'WHO-5: ' + who5[idx] + ' (' + METRIC_HINTS.who5 + ')';
+                                return 'WHO-5: ' + who5[idx].toFixed(1) + ' (' + METRIC_HINTS.who5 + ')';
                             }
                             if (context.dataset.label.includes('Стрес')) {
-                                return 'Стрес: ' + stressRaw[idx] + ' / 40 (' + METRIC_HINTS.stress + ')';
+                                return 'Стрес: ' + stressRaw[idx].toFixed(1) + ' / 40 (' + METRIC_HINTS.stress + ')';
                             }
-                            return 'Сон: ' + sleepRaw[idx] + ' год (' + METRIC_HINTS.sleep + ')';
+                            return 'Сон: ' + sleepRaw[idx].toFixed(1) + ' год (' + METRIC_HINTS.sleep + ')';
                         }
                     }
+                }
+            },
+            elements: {
+                point: {
+                    radius: 4,
+                    hoverRadius: 7,
+                    backgroundColor: '#0f172a',
+                    borderWidth: 2
+                },
+                line: {
+                    borderJoinStyle: 'round'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     suggestedMax: 100,
-                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
-                    ticks: { color: '#cbd5e1' }
+                    grid: { color: 'rgba(148, 163, 184, 0.12)' },
+                    ticks: { color: '#cbd5e1', font: { size: 12 } }
                 },
                 x: {
-                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
-                    ticks: { color: '#cbd5e1' }
+                    grid: { color: 'rgba(99, 102, 241, 0.08)' },
+                    ticks: { color: '#cbd5e1', font: { size: 12 } }
                 }
             }
         }
@@ -270,13 +314,94 @@ function renderRiskBubbleChart() {
     const points = teamData.employees.map(emp => ({
         x: emp.metrics.stressLevel,
         y: emp.metrics.mbi,
-        r: Math.max(8, emp.metrics.phq9 + 4),
+        r: Math.min(26, Math.max(10, emp.metrics.phq9 * 1.2)),
+        phq9: emp.metrics.phq9,
         name: emp.name,
         risk: emp.riskLevel || 'medium'
     }));
 
+    const riskZonesPlugin = {
+        id: 'riskZonesPlugin',
+        beforeDraw: (chart) => {
+            const { ctx, chartArea, scales } = chart;
+            if (!chartArea) return;
+            const { left, right, top, bottom } = chartArea;
+            const { x, y } = scales;
+            const stressWatch = x.getPixelForValue(18);
+            const stressHigh = x.getPixelForValue(28);
+            const burnoutWatch = y.getPixelForValue(40);
+            const burnoutHigh = y.getPixelForValue(65);
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(34, 197, 94, 0.06)';
+            ctx.fillRect(left, burnoutWatch, stressWatch - left, bottom - burnoutWatch);
+            ctx.fillStyle = 'rgba(251, 191, 36, 0.05)';
+            ctx.fillRect(stressWatch, burnoutHigh, stressHigh - stressWatch, bottom - burnoutHigh);
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.07)';
+            ctx.fillRect(stressHigh, top, right - stressHigh, burnoutHigh - top);
+
+            ctx.setLineDash([6, 4]);
+            ctx.strokeStyle = 'rgba(226, 232, 240, 0.2)';
+            ctx.lineWidth = 1;
+            [stressWatch, stressHigh].forEach(posX => {
+                ctx.beginPath();
+                ctx.moveTo(posX, top);
+                ctx.lineTo(posX, bottom);
+                ctx.stroke();
+            });
+            [burnoutWatch, burnoutHigh].forEach(posY => {
+                ctx.beginPath();
+                ctx.moveTo(left, posY);
+                ctx.lineTo(right, posY);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+    };
+
+    const hoverNamePlugin = {
+        id: 'hoverNamePlugin',
+        afterDatasetsDraw: (chart) => {
+            const active = chart.getActiveElements();
+            if (!active.length) return;
+
+            const { datasetIndex, index } = active[0];
+            const meta = chart.getDatasetMeta(datasetIndex);
+            const point = meta?.data?.[index];
+            const raw = chart.data.datasets[datasetIndex].data[index];
+            if (!point || !raw) return;
+
+            const { ctx } = chart;
+            const { x, y } = point.tooltipPosition();
+            const label = raw.name;
+            ctx.save();
+            ctx.font = '600 12px "Segoe UI", "Inter", system-ui, -apple-system, sans-serif';
+            const textWidth = ctx.measureText(label).width;
+            const paddingX = 10;
+            const boxWidth = textWidth + paddingX * 2;
+            const boxHeight = 26;
+            const boxX = x - boxWidth / 2;
+            const boxY = y - boxHeight - 12;
+
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+            ctx.shadowBlur = 12;
+            drawRoundedRect(ctx, boxX, boxY, boxWidth, boxHeight, 8);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.55)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillText(label, boxX + paddingX, boxY + boxHeight / 2 + 4);
+            ctx.restore();
+        }
+    };
+
     charts.riskBubble = new Chart(ctx, {
         type: 'bubble',
+        plugins: [riskZonesPlugin, hoverNamePlugin],
         data: {
             datasets: [{
                 label: 'Ризики',
@@ -284,23 +409,42 @@ function renderRiskBubbleChart() {
                 backgroundColor: points.map(p => (colors[p.risk]?.fill || colors.medium.fill)),
                 borderColor: points.map(p => (colors[p.risk]?.border || colors.medium.border)),
                 borderWidth: 2,
-                hoverBorderWidth: 3
+                hoverBorderWidth: 3,
+                hoverBorderColor: '#fff',
+                hitRadius: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 14, right: 18, bottom: 14, left: 12 } },
+            interaction: { mode: 'nearest', intersect: true },
+            elements: {
+                point: {
+                    borderWidth: 2,
+                    hoverBorderWidth: 3,
+                    hitRadius: 6
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    borderColor: 'rgba(99, 102, 241, 0.35)',
+                    borderWidth: 1,
+                    displayColors: false,
+                    padding: 12,
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#cbd5e1',
+                    cornerRadius: 10,
                     callbacks: {
+                        title: (ctx) => ctx[0]?.raw?.name || 'Співробітник',
                         label: (context) => {
                             const raw = context.raw;
                             return [
-                                raw.name,
                                 'Стрес: ' + raw.x + '/40',
                                 'MBI: ' + raw.y.toFixed(1) + '%',
-                                'PHQ-9: ' + (raw.r - 4)
+                                'PHQ-9: ' + Math.max(0, Math.round(raw.phq9))
                             ];
                         }
                     }
@@ -316,8 +460,8 @@ function renderRiskBubbleChart() {
                     },
                     beginAtZero: true,
                     max: 40,
-                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
-                    ticks: { color: '#cbd5e1' }
+                    grid: { color: 'rgba(148, 163, 184, 0.12)', lineWidth: 1 },
+                    ticks: { color: '#cbd5e1', font: { size: 12 } }
                 },
                 y: {
                     title: {
@@ -328,8 +472,8 @@ function renderRiskBubbleChart() {
                     },
                     beginAtZero: true,
                     max: 100,
-                    grid: { color: 'rgba(99, 102, 241, 0.1)' },
-                    ticks: { color: '#cbd5e1' }
+                    grid: { color: 'rgba(148, 163, 184, 0.12)', lineWidth: 1 },
+                    ticks: { color: '#cbd5e1', font: { size: 12 } }
                 }
             },
             animation: { duration: 900, easing: 'easeOutQuart' }
@@ -805,9 +949,11 @@ function updateText(id, text) {
 function fillMetricsGrid(id, metrics) {
     const grid = document.getElementById(id);
     if (!grid) return;
-    grid.innerHTML = metrics.map(item =>
-        `<div class="modal-metric"><span class="metric-label" title="${METRIC_HINTS[item.key] || ''}">${item.label}</span><span class="metric-value">${item.value}</span></div>`
-    ).join('');
+    grid.innerHTML = metrics.map(item => {
+        const hint = METRIC_HINTS[item.key] || '';
+        const tooltip = hint ? `<span class="modal-tooltip" data-tooltip="${hint}">?</span>` : '';
+        return `<div class="modal-metric"><span class="metric-label">${item.label}${tooltip}</span><span class="metric-value">${item.value}</span></div>`;
+    }).join('');
 }
 
 function deltaText(value) {
@@ -818,4 +964,19 @@ function deltaText(value) {
 function getLatestAverage() {
     const latestKey = getLatestMonthKey();
     return teamData.teamAverages[latestKey] || teamData.teamAverages.current;
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
 }

@@ -130,7 +130,7 @@
             <div class="chart-card full-width lift">
                 <div class="chart-title">Траєкторія благополуччя</div>
                 <div class="chart-wrapper" style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                    <div class="chart-container" style="height: 300px;">
+                    <div class="chart-container trajectory-container" style="height: 300px;">
                         <canvas id="trajectoryChart"></canvas>
                     </div>
                 </div>
@@ -147,21 +147,6 @@
                     <p>Матриця допомагає візуально ідентифікувати співробітників, які потребують найбільшої уваги.
                     Чим правіше та вище знаходиться точка - тим вищий ризик вигорання та проблем з ментальним здоров'ям.</p>
 
-                    <div class="matrix-legend">
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #22c55e;"></span>
-                            <span>Низький ризик (все добре)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #fbbf24;"></span>
-                            <span>Середній ризик (потребує моніторингу)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #ef4444;"></span>
-                            <span>Високий ризик (термінова підтримка)</span>
-                        </div>
-                    </div>
-
                     <div class="matrix-axes-explanation">
                         <p><strong>Вісь X (Рівень стресу):</strong> Показує загальне навантаження та напругу</p>
                         <p><strong>Вісь Y (Індекс вигорання):</strong> Показує емоційне виснаження</p>
@@ -170,7 +155,7 @@
                 </div>
 
                 <div class="chart-wrapper" style="width: 100%; max-width: 1000px; margin: 0 auto;">
-                    <div class="chart-container" style="height: 500px;">
+                    <div class="chart-container risk-matrix-container" style="height: 500px;">
                         <canvas id="riskBubbleChart"></canvas>
                     </div>
                 </div>

@@ -392,6 +392,52 @@ header {
     height: clamp(260px, 32vw, 400px) !important;
 }
 
+.chart-container {
+    position: relative;
+}
+
+.chart-container canvas {
+    position: relative;
+    z-index: 1;
+}
+
+.trajectory-container,
+.risk-matrix-container {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.trajectory-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.06), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(34, 197, 94, 0.05), transparent 30%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.55) 100%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.risk-matrix-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 82%, rgba(34, 197, 94, 0.07), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(239, 68, 68, 0.07), transparent 25%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.65));
+    z-index: 0;
+    pointer-events: none;
+}
+
+.trajectory-container canvas,
+.risk-matrix-container canvas {
+    height: 100% !important;
+}
+
 .sleep-debt-chart canvas,
 .benchmark-card canvas,
 .forecast-card canvas {
@@ -788,11 +834,72 @@ footer {
 .modal-metric .metric-label {
     font-size: var(--font-md);
     color: var(--text-quaternary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .modal-metric .metric-value {
     font-size: var(--font-lg);
     font-weight: var(--weight-bold);
+}
+
+.modal-tooltip {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.22));
+    border: 1px solid var(--border-active);
+    color: var(--accent-light-indigo);
+    font-weight: var(--weight-bold);
+    font-size: 11px;
+    cursor: help;
+    position: relative;
+}
+
+.modal-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translate(-50%, 4px);
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    font-size: var(--font-sm);
+    font-weight: var(--weight-medium);
+    min-width: 200px;
+    max-width: 320px;
+    box-shadow: 0 14px 50px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 5;
+    white-space: normal;
+    line-height: 1.4;
+}
+
+.modal-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 118%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: rgba(99, 102, 241, 0.35);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.modal-tooltip:hover::after,
+.modal-tooltip:hover::before {
+    opacity: 1;
+    transform: translate(-50%, -2px);
 }
 
 .modal-risk p {
