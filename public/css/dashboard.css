@@ -672,9 +672,7 @@ footer {
 }
 
 .modal-subtitle {
-    color: var(--text-quaternary);
-    margin-bottom: var(--spacing-lg);
-    font-size: var(--font-lg);
+    display: none;
 }
 
 .modal-metrics,
