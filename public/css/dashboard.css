@@ -442,6 +442,39 @@ header {
     margin-bottom: var(--spacing-lg);
 }
 
+/* Employee Table Month Selector */
+.employee-month-selector {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.employee-month-btn {
+    padding: 0.6rem 1.5rem;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-size: 0.9rem;
+    font-weight: var(--weight-medium);
+}
+
+.employee-month-btn:hover {
+    border-color: var(--primary-indigo);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.employee-month-btn.active {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-purple));
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-button);
+}
+
 .table-container {
     background: linear-gradient(135deg, var(--bg-secondary), rgba(30, 41, 59, 0.3));
     backdrop-filter: blur(10px);

@@ -152,6 +152,15 @@
         <!-- Employee Analysis Table -->
         <section class="table-section">
             <h2 class="section-title">Аналіз працівників</h2>
+
+            <!-- Employee Month Selector -->
+            <div class="employee-month-selector">
+                <button class="employee-month-btn" data-month="8" onclick="switchEmployeeMonth(8)">Серпень</button>
+                <button class="employee-month-btn" data-month="9" onclick="switchEmployeeMonth(9)">Вересень</button>
+                <button class="employee-month-btn" data-month="10" onclick="switchEmployeeMonth(10)">Жовтень</button>
+                <button class="employee-month-btn active" data-month="11" onclick="switchEmployeeMonth(11)">Листопад</button>
+            </div>
+
             <div class="table-container">
                 <table id="employee-table">
                     <thead>
@@ -227,6 +236,7 @@
     <script>
         // Global variables
         let currentMonth = 11; // November - latest month
+        let currentEmployeeMonth = 11; // Start with November for employee table
         let teamData = null;
         let charts = {};
         const METRIC_HINTS = {
@@ -275,6 +285,76 @@
             updateDashboard();
         }
 
+        // Employee table month switcher
+        async function switchEmployeeMonth(month) {
+            currentEmployeeMonth = month;
+
+            // Update button states
+            document.querySelectorAll('.employee-month-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.month) === month) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Reload employee data for selected month
+            await loadEmployeeData(month);
+        }
+
+        async function loadEmployeeData(month) {
+            try {
+                if (!teamData) return;
+
+                const monthData = teamData.months.find(m => m.month === month);
+                if (!monthData) return;
+
+                const tbody = document.getElementById('employee-table-body');
+                tbody.innerHTML = '';
+
+                monthData.employees.forEach(emp => {
+                    const row = document.createElement('tr');
+
+                    // Calculate overall risk
+                    const risks = [
+                        getRiskLevel('who5', emp.who5),
+                        getRiskLevel('phq9', emp.phq9),
+                        getRiskLevel('gad7', emp.gad7),
+                        getRiskLevel('mbi', emp.mbi),
+                        getRiskLevel('sleepDuration', emp.sleepDuration),
+                        getRiskLevel('sleepQuality', emp.sleepQuality),
+                        getRiskLevel('workLifeBalance', emp.workLifeBalance),
+                        getRiskLevel('stressLevel', emp.stressLevel)
+                    ];
+
+                    const highCount = risks.filter(r => r === 'high').length;
+                    const mediumCount = risks.filter(r => r === 'medium').length;
+
+                    let overallRisk = 'low';
+                    if (highCount >= 3 || (highCount >= 2 && mediumCount >= 3)) {
+                        overallRisk = 'high';
+                    } else if (highCount >= 1 || mediumCount >= 3) {
+                        overallRisk = 'medium';
+                    }
+
+                    row.innerHTML = `
+                        <td class="employee-name clickable" onclick="openEmployeeModal('${emp.name}')">${emp.name}</td>
+                        <td class="score-cell ${getScoreClass('who5', emp.who5)}">${emp.who5.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('phq9', emp.phq9)}">${emp.phq9.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('gad7', emp.gad7)}">${emp.gad7.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('mbi', emp.mbi)}">${emp.mbi.toFixed(1)}%</td>
+                        <td class="score-cell ${getScoreClass('sleepDuration', emp.sleepDuration)}">${emp.sleepDuration.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('sleepQuality', emp.sleepQuality)}">${emp.sleepQuality.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('workLifeBalance', emp.workLifeBalance)}">${emp.workLifeBalance.toFixed(1)}</td>
+                        <td class="score-cell ${getScoreClass('stressLevel', emp.stressLevel)}">${emp.stressLevel.toFixed(1)}</td>
+                        <td class="score-cell"><span class="risk-indicator risk-${overallRisk}">${getRiskLabel(overallRisk)}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+
         // Update dashboard with current month data
         function updateDashboard() {
             if (!teamData) return;
@@ -284,6 +364,8 @@
             updateTeamTrendChart();
             updateEmployeeTable(monthData);
             updateRiskAssessment(monthData);
+            // Load employee table with current employee month
+            loadEmployeeData(currentEmployeeMonth);
         }
 
         // Get data for selected month
