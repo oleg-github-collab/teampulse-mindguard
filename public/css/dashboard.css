@@ -389,7 +389,7 @@ header {
 .chart-card canvas {
     display: block;
     width: 100% !important;
-    height: clamp(260px, 45vw, 380px) !important;
+    height: clamp(260px, 32vw, 400px) !important;
 }
 
 .sleep-debt-chart canvas,
@@ -397,6 +397,37 @@ header {
 .forecast-card canvas {
     width: 100% !important;
     height: clamp(240px, 40vw, 360px) !important;
+}
+
+.chart-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.chart-comment {
+    color: var(--text-quaternary);
+    font-size: var(--font-sm);
+}
+
+.detail-btn {
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-purple));
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-weight: var(--weight-medium);
+    box-shadow: var(--shadow-button);
+}
+
+.detail-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-button-hover);
 }
 
 .chart-title {
@@ -1150,6 +1181,19 @@ footer {
     line-height: 1.5;
     position: relative;
     z-index: 1;
+}
+
+.insight-list {
+    margin: 0 0 var(--spacing-sm) 1.2rem;
+    color: var(--text-secondary);
+    font-size: var(--font-md);
+}
+
+.insight-plan {
+    color: var(--text-tertiary);
+    font-size: var(--font-md);
+    margin-top: var(--spacing-xs);
+    font-style: italic;
 }
 
 .roi-grid {

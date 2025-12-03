@@ -1,6 +1,20 @@
 // Global variables
 let teamData = null;
 let charts = {};
+const MONTH_LABELS = {
+    august: 'Серп',
+    september: 'Вер',
+    october: 'Жовт',
+    november: 'Лист',
+    december: 'Груд',
+    january: 'Січ',
+    february: 'Лют',
+    march: 'Бер',
+    april: 'Квіт',
+    may: 'Трав',
+    june: 'Черв',
+    july: 'Лип'
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -77,7 +91,7 @@ function calculateTeamHealthScore() {
 function updateBenchmarking() {
     if (!teamData) return;
 
-    const avg = teamData.teamAverages.current;
+    const avg = getLatestAverage();
     const benchmarks = {
         who5: { your: avg.who5, industry: 62, higherIsBetter: true, max: 100 },
         phq9: { your: avg.phq9, industry: 6.8, higherIsBetter: false, max: 27 },
@@ -120,14 +134,14 @@ function renderTrajectoryChart() {
     const ctxEl = document.getElementById('trajectoryChart');
     if (!ctxEl) return;
 
-    const months = ['august', 'september', 'october', 'november'];
-    const labels = ['Серп', 'Вер', 'Жовт', 'Лист'];
+    const months = getRecentMonths(4);
     const averages = teamData.teamAverages;
+    const labels = months.map(labelFromKey);
 
-    const who5 = months.map(m => averages[m].who5);
-    const stressRaw = months.map(m => averages[m].stressLevel);
+    const who5 = months.map(m => averages[m]?.who5 ?? 0);
+    const stressRaw = months.map(m => averages[m]?.stressLevel ?? 0);
     const stress = stressRaw.map(v => (v / 40) * 100);
-    const sleepRaw = months.map(m => averages[m].sleepDuration);
+    const sleepRaw = months.map(m => averages[m]?.sleepDuration ?? 0);
     const sleep = sleepRaw.map(v => (v / 9) * 100);
 
     if (charts.trajectory) charts.trajectory.destroy();
@@ -178,8 +192,8 @@ function renderTrajectoryChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            aspectRatio: 1.8,
+            maintainAspectRatio: true,
+            aspectRatio: 1.6,
             plugins: {
                 legend: {
                     labels: { color: '#e2e8f0' }
@@ -213,6 +227,24 @@ function renderTrajectoryChart() {
             }
         }
     });
+
+    const latestKey = getLatestMonthKey();
+    const prevKey = getPrevMonthKey();
+    const latestIdx = months.indexOf(latestKey);
+    const prevIdx = Math.max(0, latestIdx - 1);
+    const whoDelta = who5[latestIdx] - who5[prevIdx];
+    const stressDelta = stressRaw[latestIdx] - stressRaw[prevIdx];
+    const sleepDelta = sleepRaw[latestIdx] - sleepRaw[prevIdx];
+
+    updateText('trajectoryComment', `Останній місяць (${labelFromKey(latestKey)}): WHO-5 ${who5[latestIdx].toFixed(1)}, сон ${sleepRaw[latestIdx].toFixed(1)} год, стрес ${stressRaw[latestIdx].toFixed(1)}/40. Δ vs ${labelFromKey(prevKey)}: WHO-5 ${(whoDelta>=0?'+':'') + whoDelta.toFixed(1)}, сон ${(sleepDelta>=0?'+':'') + sleepDelta.toFixed(1)} год, стрес ${(stressDelta>=0?'+':'') + stressDelta.toFixed(1)}.`);
+
+    const modalMetrics = [
+        { label: 'WHO-5', value: who5[latestIdx].toFixed(1) + ` (${deltaText(whoDelta)})` },
+        { label: 'Сон (год)', value: sleepRaw[latestIdx].toFixed(1) + ` (${deltaText(sleepDelta)})` },
+        { label: 'Стрес (0-40)', value: stressRaw[latestIdx].toFixed(1) + ` (${deltaText(stressDelta)})` }
+    ];
+    fillMetricsGrid('trajectoryMetrics', modalMetrics);
+    updateText('trajectorySummary', `Фокус: за останній місяць ${labelFromKey(latestKey)} змінились головні показники настрою, сну та стресу. Це базовий барометр команди на останню хвилю вимірювань.`);
 }
 
 // Stress vs burnout matrix
@@ -255,8 +287,8 @@ function renderRiskBubbleChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            aspectRatio: 1.2,
+            maintainAspectRatio: true,
+            aspectRatio: 1.35,
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -292,6 +324,22 @@ function renderRiskBubbleChart() {
             animation: { duration: 900, easing: 'easeOutQuart' }
         }
     });
+
+    const counts = points.reduce((acc, p) => {
+        acc[p.risk] = (acc[p.risk] || 0) + 1;
+        return acc;
+    }, {});
+    const topRisk = points.slice().sort((a, b) => (b.y + b.x) - (a.y + a.x))[0];
+    updateText('riskComment', `Ризики: high ${counts.high || 0}, medium ${counts.medium || 0}, low ${counts.low || 0}. Найвищий ризик: ${topRisk?.name || '—'} (${topRisk?.position || ''}).`);
+
+    const modalMetrics = [
+        { label: 'High', value: counts.high || 0 },
+        { label: 'Medium', value: counts.medium || 0 },
+        { label: 'Low', value: counts.low || 0 },
+        { label: 'Найвищий ризик', value: topRisk ? `${topRisk.name} · MBI ${topRisk.y.toFixed(0)}%, стрес ${topRisk.x}/40` : '—' }
+    ];
+    fillMetricsGrid('riskMetrics', modalMetrics);
+    updateText('riskSummary', 'Матриця поєднує стрес, вигорання та PHQ-9 як радіус, щоб за секунди визначити, кого брати на 1:1 першими.');
 }
 
 // Calculate Forecast
@@ -299,20 +347,23 @@ function calculateForecast() {
     if (!teamData) return;
 
     const history = teamData.teamAverages;
+    const monthKeys = getMonthKeys();
+    const latestKey = getLatestMonthKey();
+    const prevKey = getPrevMonthKey();
     const metrics = [
-        { key: 'who5', name: 'WHO-5 Благополуччя' },
-        { key: 'phq9', name: 'PHQ-9 Депресія' },
-        { key: 'mbi', name: 'MBI Вигорання' }
+        { key: 'who5', name: 'WHO-5 Благополуччя', tooltip: 'WHO-5: 0-100, <50 — ризик зниження благополуччя' },
+        { key: 'phq9', name: 'PHQ-9 Депресія', tooltip: 'PHQ-9: 0-27, >10 — середня депресивна симптоматика' },
+        { key: 'mbi', name: 'MBI Вигорання', tooltip: 'MBI: 0-100%, >40% — високий ризик вигорання' }
     ];
 
     const forecastGrid = document.getElementById('forecastGrid');
     forecastGrid.innerHTML = '';
 
     metrics.forEach(metric => {
-        const oct = history.october[metric.key];
-        const nov = history.november[metric.key];
-        const trend = nov - oct;
-        const forecast = nov + trend;
+        const prev = history[prevKey]?.[metric.key] ?? history[latestKey]?.[metric.key];
+        const curr = history[latestKey]?.[metric.key] ?? prev;
+        const trend = curr - prev;
+        const forecast = curr + trend;
 
         const trendArrow = trend > 0 ? '📈' : trend < 0 ? '📉' : '➡️';
         const trendText = trend > 0 ? 'Зростання' : trend < 0 ? 'Зниження' : 'Стабільно';
@@ -320,9 +371,9 @@ function calculateForecast() {
         const card = document.createElement('div');
         card.className = 'forecast-card';
 
-        card.innerHTML = '<h3>' + metric.name + '</h3>' +
+        card.innerHTML = '<h3 title="' + metric.tooltip + '">' + metric.name + '</h3>' +
             '<div class="forecast-value">' + forecast.toFixed(1) + '</div>' +
-            '<div class="forecast-trend">' + trendArrow + ' ' + trendText + '</div>' +
+            '<div class="forecast-trend">' + trendArrow + ' ' + trendText + ' (' + labelFromKey(prevKey) + '→' + labelFromKey(latestKey) + ')</div>' +
             '<div class="forecast-change">Зміна: ' + (trend > 0 ? '+' : '') + trend.toFixed(1) + '</div>';
 
         forecastGrid.appendChild(card);
@@ -383,6 +434,7 @@ function analyzeSleepDebt() {
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            aspectRatio: 1.5,
             plugins: {
                 legend: {
                     labels: {
@@ -457,21 +509,33 @@ function renderEmployeeInsights() {
             pill: 'CRITICAL',
             title: 'Терміновий фокус 1:1',
             body: topRiskNames || 'Немає червоних прапорців цього тижня.',
-            actions: 'Заплануй 12-хв check-in, зніми 2 блокери, підтвердь доступ до психолога/коуча і домовся про follow-up через 7 днів.'
+            bullets: [
+                topRiskNames ? 'Фокус на працівниках з найвищим MBI/PHQ-9.' : 'Команда без червоних тригерів.',
+                'Уточнити, чи є інші ранні симптоми (сон <6.5 год, PHQ-9>10).'
+            ],
+            plan: 'План дій Олега: короткі 12-хв check-in з найризиковішими, нотувати 2 блокери та підтвердити підтримку психолога/коуча з фіксацією follow-up через 7 днів.'
         },
         {
             pill: 'RECOVERY',
             title: 'Найбільше відновлення',
             body: topRecovery || 'Динаміка стабільна, різких підйомів не зафіксовано.',
-            actions: topRecovery
-                ? 'Запитай, що спрацювало, і масштабуй ці практики на команду (peer sharing на 15 хв).'
-                : 'Підтримуй стабільний ритм: короткі 1:1 раз на 2 тижні для фіксації настрою.'
+            bullets: [
+                topRecovery ? 'Є чіткі історії відновлення — потенційні best practices.' : 'Без стрибків зростання — моніторити стабільність.',
+                'Важливо зафіксувати, що саме спрацювало.'
+            ],
+            plan: topRecovery
+                ? 'План дій Олега: провести 15-хв peer sharing з цими людьми, записати 2-3 ритуали та поширити в команді.'
+                : 'План дій Олега: залишити короткі 1:1 раз на 2 тижні для відстеження настрою.'
         },
         {
             pill: 'DROP',
             title: 'Негативна динаміка',
             body: declines || 'Немає різких спадів за місяць.',
-            actions: 'Перевір навантаження та пріоритети, підключи buddy з еталонного балансу й зафіксуй одну зміну в календарі.'
+            bullets: [
+                declines ? 'Є падіння WHO-5 — потенційні локальні проблеми.' : 'Без суттєвих спадів — тримати моніторинг.',
+                'Ймовірні причини: пікове навантаження чи недосип.'
+            ],
+            plan: 'План дій Олега: перевірити пріоритети, запропонувати buddy з еталонного балансу та закріпити одну зміну в календарі (менше мітингів/гнучкий старт).'
         },
         {
             pill: 'SLEEP',
@@ -479,7 +543,11 @@ function renderEmployeeInsights() {
             body: sleepDebt.length
                 ? sleepDebt.map(d => `${d.name.split(' ')[0]} (+${d.debt.toFixed(0)} год/тижд)`).join(', ')
                 : 'Борг сну в нормі.',
-            actions: 'Фіксуємо правило «без пінгів після 19:00», гнучкий старт дня та 2 дні з пізнішим стендапом для групи ризику.'
+            bullets: [
+                sleepDebt.length ? 'Є помітний борг сну — ризик падіння продуктивності.' : 'Сон стабільний — можна підтримувати режим.',
+                'Недосип корелює з вигоранням і PHQ-9.'
+            ],
+            plan: 'План дій Олега: підтвердити правило «без пінгів після 19:00», дати гнучкий старт дня та 2 дні з пізнішим стендапом для групи ризику.'
         },
         {
             pill: 'BALANCE',
@@ -487,7 +555,11 @@ function renderEmployeeInsights() {
             body: balanced.map(b =>
                 `${b.name.split(' ')[0]} (баланс ${b.metrics.workLifeBalance}/10, стрес ${b.metrics.stressLevel}/40)`
             ).join(', '),
-            actions: 'Запроси їх як buddy для колег у ризику; задокументуй їхні ритуали відновлення в внутрішньому гайді.'
+            bullets: [
+                'Є еталонні практики work-life balance у команді.',
+                'Ці люди можуть бути buddy/менторами для групи ризику.'
+            ],
+            plan: 'План дій Олега: запросити їх як buddy для ризикових колег та задокументувати їхні ритуали у внутрішньому гайді.'
         }
     ];
 
@@ -499,7 +571,8 @@ function renderEmployeeInsights() {
             <span class="insight-pill">★ ${card.pill}</span>
             <div class="insight-title">${card.title}</div>
             <div class="insight-body">${card.body}</div>
-            <div class="insight-actions">${card.actions}</div>
+            <ul class="insight-list">${(card.bullets || []).map(b => `<li>${b}</li>`).join('')}</ul>
+            <div class="insight-plan">${card.plan}</div>
         `;
         grid.appendChild(el);
     });
@@ -661,6 +734,22 @@ function toggleCallKit(id) {
     el.classList.toggle('open');
 }
 
+function openChartModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeChartModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
+}
+
+function modalBgClick(event, id) {
+    if (event.target.id === id) {
+        closeChartModal(id);
+    }
+}
+
 function handleLogout() {
     if (confirm('Ви впевнені, що хочете вийти?')) {
         window.location.href = '/';
@@ -673,4 +762,51 @@ function showError(message) {
     errorDiv.style.cssText = 'background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;';
     errorDiv.textContent = message;
     container.insertBefore(errorDiv, container.firstChild);
+}
+
+// Helpers
+function getMonthKeys() {
+    return Object.keys(teamData.teamAverages).filter(k => k !== 'current');
+}
+
+function getLatestMonthKey() {
+    const months = getMonthKeys();
+    return months[months.length - 1];
+}
+
+function getPrevMonthKey() {
+    const months = getMonthKeys();
+    return months[Math.max(0, months.length - 2)];
+}
+
+function getRecentMonths(limit) {
+    const months = getMonthKeys();
+    return months.slice(Math.max(0, months.length - limit));
+}
+
+function labelFromKey(key) {
+    return MONTH_LABELS[key] || key;
+}
+
+function updateText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
+function fillMetricsGrid(id, metrics) {
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    grid.innerHTML = metrics.map(item =>
+        `<div class="modal-metric"><span class="metric-label">${item.label}</span><span class="metric-value">${item.value}</span></div>`
+    ).join('');
+}
+
+function deltaText(value) {
+    const prefix = value > 0 ? '+' : '';
+    return `${prefix}${value.toFixed(1)}`;
+}
+
+function getLatestAverage() {
+    const latestKey = getLatestMonthKey();
+    return teamData.teamAverages[latestKey] || teamData.teamAverages.current;
 }

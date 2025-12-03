@@ -29,11 +29,19 @@
                     <div class="chart-title">Траєкторія благополуччя</div>
                     <canvas id="trajectoryChart"></canvas>
                     <p class="chart-note">WHO-5, стрес і сон нормовані до 100 для швидкого порівняння</p>
+                    <div class="chart-actions">
+                        <p class="chart-comment" id="trajectoryComment">Дані оновлюються...</p>
+                        <button class="detail-btn" onclick="openChartModal('trajectoryModal')">Детальніше</button>
+                    </div>
                 </div>
                 <div class="chart-card lift">
                     <div class="chart-title">Матриця ризиків 1:1</div>
                     <canvas id="riskBubbleChart"></canvas>
                     <div class="chart-note">Розмір кола = PHQ-9, X = стрес, Y = MBI. Колір = рівень ризику.</div>
+                    <div class="chart-actions">
+                        <p class="chart-comment" id="riskComment">Дані оновлюються...</p>
+                        <button class="detail-btn" onclick="openChartModal('riskModal')">Детальніше</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -54,7 +62,7 @@
             <div class="benchmark-grid">
                 <div class="benchmark-card">
                     <div class="benchmark-header">
-                        <h3>WHO-5 Благополуччя</h3>
+                        <h3 title="WHO-5 Well-Being Index: 0-100, <50 — ризик зниження благополуччя, <28 — ймовірна депресія">WHO-5 Благополуччя</h3>
                         <span class="benchmark-status" id="who5Status"></span>
                     </div>
                     <div class="benchmark-comparison">
@@ -71,7 +79,7 @@
 
                 <div class="benchmark-card">
                     <div class="benchmark-header">
-                        <h3>PHQ-9 Депресія</h3>
+                        <h3 title="PHQ-9: 0-27, >10 — середня депресивна симптоматика">PHQ-9 Депресія</h3>
                         <span class="benchmark-status" id="phq9Status"></span>
                     </div>
                     <div class="benchmark-comparison">
@@ -88,7 +96,7 @@
 
                 <div class="benchmark-card">
                     <div class="benchmark-header">
-                        <h3>GAD-7 Тривожність</h3>
+                        <h3 title="GAD-7: 0-21, >10 — середня/висока тривожність">GAD-7 Тривожність</h3>
                         <span class="benchmark-status" id="gad7Status"></span>
                     </div>
                     <div class="benchmark-comparison">
@@ -105,7 +113,7 @@
 
                 <div class="benchmark-card">
                     <div class="benchmark-header">
-                        <h3>MBI Вигорання</h3>
+                        <h3 title="MBI: 0-100%, >40% — високий ризик вигорання">MBI Вигорання</h3>
                         <span class="benchmark-status" id="mbiStatus"></span>
                     </div>
                     <div class="benchmark-comparison">
@@ -122,7 +130,7 @@
 
                 <div class="benchmark-card">
                     <div class="benchmark-header">
-                        <h3>Рівень стресу</h3>
+                        <h3 title="Суб'єктивний стрес: 0-40, >20 — підвищений рівень">Рівень стресу</h3>
                         <span class="benchmark-status" id="stressStatus"></span>
                     </div>
                     <div class="benchmark-comparison">
@@ -219,6 +227,35 @@
                 <!-- Filled by JavaScript -->
             </div>
         </section>
+
+        <!-- Chart Detail Modals -->
+        <div id="trajectoryModal" class="modal" onclick="modalBgClick(event, 'trajectoryModal')">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeChartModal('trajectoryModal')">&times;</span>
+                <h2 class="modal-title">Траєкторія благополуччя</h2>
+                <div class="modal-notes">
+                    <p id="trajectorySummary">Дані оновлюються...</p>
+                </div>
+                <div class="modal-metrics">
+                    <h3>Ключові показники</h3>
+                    <div class="modal-metrics-grid" id="trajectoryMetrics"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="riskModal" class="modal" onclick="modalBgClick(event, 'riskModal')">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeChartModal('riskModal')">&times;</span>
+                <h2 class="modal-title">Матриця ризиків 1:1</h2>
+                <div class="modal-notes">
+                    <p id="riskSummary">Дані оновлюються...</p>
+                </div>
+                <div class="modal-metrics">
+                    <h3>Розкладання ризику</h3>
+                    <div class="modal-metrics-grid" id="riskMetrics"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer>
