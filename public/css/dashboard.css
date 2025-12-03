@@ -383,11 +383,20 @@ header {
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
+    position: relative;
 }
 
 .chart-card canvas {
+    display: block;
     width: 100% !important;
-    min-height: 260px;
+    height: clamp(260px, 45vw, 380px) !important;
+}
+
+.sleep-debt-chart canvas,
+.benchmark-card canvas,
+.forecast-card canvas {
+    width: 100% !important;
+    height: clamp(240px, 40vw, 360px) !important;
 }
 
 .chart-title {
@@ -1053,6 +1062,7 @@ footer {
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-md);
+    position: relative;
 }
 
 .sleep-debt-citation {
