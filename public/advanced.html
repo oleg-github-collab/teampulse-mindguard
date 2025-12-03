@@ -4,689 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Analytics - TeamPulse Mindguard AI</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            line-height: 1.6;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        header {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #c4b5fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-btn {
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .analytics-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 16px;
-            padding: 2rem;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .score-display {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .score-value {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .score-label {
-            color: #94a3b8;
-            font-size: 1rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            border-radius: 4px;
-            transition: width 1s ease;
-        }
-
-        .benchmark-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-        }
-
-        .benchmark-label {
-            color: #cbd5e1;
-        }
-
-        .benchmark-value {
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .forecast-item {
-            padding: 1.5rem;
-            background: rgba(15, 23, 42, 0.5);
-            border-left: 4px solid;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .forecast-item.positive {
-            border-color: #22c55e;
-        }
-
-        .forecast-item.neutral {
-            border-color: #fbbf24;
-        }
-
-        .forecast-item.negative {
-            border-color: #ef4444;
-        }
-
-        .forecast-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-
-        .forecast-description {
-            color: #94a3b8;
-            font-size: 0.95rem;
-        }
-
-        .recommendation-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .recommendation-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .recommendation-icon {
-            font-size: 2rem;
-        }
-
-        .recommendation-title {
-            font-weight: 600;
-            color: #fff;
-            font-size: 1.1rem;
-        }
-
-        .recommendation-content {
-            color: #cbd5e1;
-            line-height: 1.7;
-        }
-
-        .copy-btn {
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            background: rgba(99, 102, 241, 0.2);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 6px;
-            color: #a5b4fc;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: rgba(99, 102, 241, 0.3);
-        }
-
-        .roi-breakdown {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .roi-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 8px;
-        }
-
-        .roi-item-label {
-            color: #cbd5e1;
-        }
-
-        .roi-item-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #22c55e;
-        }
-
-        @media (max-width: 768px) {
-            .analytics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            body {
-                padding: 1rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <header>
-            <h1 class="header-title">📊 Advanced Analytics - TeamPulse Mindguard AI</h1>
-            <a href="dashboard.html" class="nav-btn">← Назад до Dashboard</a>
+            <h1 class="header-title">Advanced Analytics</h1>
+            <nav class="header-nav">
+                <a href="/dashboard.html" class="nav-btn">← Назад до Dashboard</a>
+                <button class="logout-btn" onclick="handleLogout()">Вийти</button>
+            </nav>
         </header>
 
-        <div class="analytics-grid">
-            <!-- Team Health Score -->
-            <div class="analytics-card">
-                <h2 class="card-title">🏥 Загальний Індекс Здоров'я Команди</h2>
-                <div class="score-display">
-                    <div class="score-value" id="healthScore">0</div>
-                    <div class="score-label">/ 100</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="healthProgress" style="width: 0%"></div>
-                </div>
-                <p style="color: #94a3b8; margin-top: 1rem;">
-                    Комплексна оцінка на основі WHO-5, PHQ-9, GAD-7, MBI та інших показників
-                </p>
+        <!-- Team Health Score -->
+        <section class="health-score-section">
+            <h2 class="section-title">Team Health Score</h2>
+            <div class="health-score-card">
+                <div class="health-score-value" id="healthScore">--</div>
+                <div class="health-score-label">з 100</div>
+                <div class="health-score-indicator" id="healthIndicator"></div>
             </div>
+        </section>
 
-            <!-- Industry Benchmarks -->
-            <div class="analytics-card">
-                <h2 class="card-title">📊 Порівняння з Галузевими Стандартами</h2>
-                <div class="benchmark-item">
-                    <span class="benchmark-label">Благополуччя (WHO-5)</span>
-                    <span class="benchmark-value" id="who5Benchmark">-</span>
-                </div>
-                <div class="benchmark-item">
-                    <span class="benchmark-label">Депресія (PHQ-9)</span>
-                    <span class="benchmark-value" id="phq9Benchmark">-</span>
-                </div>
-                <div class="benchmark-item">
-                    <span class="benchmark-label">Тривожність (GAD-7)</span>
-                    <span class="benchmark-value" id="gad7Benchmark">-</span>
-                </div>
-                <div class="benchmark-item">
-                    <span class="benchmark-label">Вигорання (MBI)</span>
-                    <span class="benchmark-value" id="mbiBenchmark">-</span>
-                </div>
-            </div>
-
-            <!-- Monthly Forecast -->
-            <div class="analytics-card">
-                <h2 class="card-title">🔮 Прогноз на Наступний Місяць</h2>
-                <div id="forecastItems">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Sleep Debt Analysis -->
-            <div class="analytics-card">
-                <h2 class="card-title">😴 Аналіз Дефіциту Сну</h2>
-                <div class="score-display">
-                    <div class="score-value" id="sleepDebt">0</div>
-                    <div class="score-label">годин/тиждень</div>
-                </div>
-                <p style="color: #94a3b8; margin-top: 1rem;">
-                    Середній дефіцит сну на команду. Рекомендована норма: 7-9 годин на добу.
-                </p>
-                <canvas id="sleepChart" style="margin-top: 1.5rem;"></canvas>
-            </div>
-
-            <!-- Wellness ROI -->
-            <div class="analytics-card">
-                <h2 class="card-title">💰 ROI Програм Благополуччя</h2>
-                <div class="roi-breakdown">
-                    <div class="roi-item">
-                        <span class="roi-item-label">Зниження плинності кадрів</span>
-                        <span class="roi-item-value">+120%</span>
+        <!-- Industry Benchmarking -->
+        <section class="benchmarking-section">
+            <h2 class="section-title">Порівняння з індустрією</h2>
+            <div class="benchmark-grid">
+                <div class="benchmark-card">
+                    <div class="benchmark-header">
+                        <h3>WHO-5 Благополуччя</h3>
+                        <span class="benchmark-status" id="who5Status"></span>
                     </div>
-                    <div class="roi-item">
-                        <span class="roi-item-label">Зменшення лікарняних</span>
-                        <span class="roi-item-value">+85%</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-item-label">Підвищення продуктивності</span>
-                        <span class="roi-item-value">+135%</span>
-                    </div>
-                    <div class="roi-item" style="border-top: 2px solid rgba(99, 102, 241, 0.3); margin-top: 0.5rem; padding-top: 1rem;">
-                        <span class="roi-item-label"><strong>Загальний ROI</strong></span>
-                        <span class="roi-item-value" style="font-size: 2rem;">+340%</span>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-bar">
+                            <div class="benchmark-your" id="who5Your"></div>
+                            <div class="benchmark-industry" id="who5Industry"></div>
+                        </div>
+                        <div class="benchmark-values">
+                            <span>Ви: <strong id="who5YourValue">--</strong></span>
+                            <span>Індустрія: <strong>62</strong></span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Stress Distribution -->
-            <div class="analytics-card">
-                <h2 class="card-title">📈 Розподіл Рівнів Стресу</h2>
-                <canvas id="stressChart"></canvas>
+                <div class="benchmark-card">
+                    <div class="benchmark-header">
+                        <h3>PHQ-9 Депресія</h3>
+                        <span class="benchmark-status" id="phq9Status"></span>
+                    </div>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-bar">
+                            <div class="benchmark-your" id="phq9Your"></div>
+                            <div class="benchmark-industry" id="phq9Industry"></div>
+                        </div>
+                        <div class="benchmark-values">
+                            <span>Ви: <strong id="phq9YourValue">--</strong></span>
+                            <span>Індустрія: <strong>6.8</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benchmark-card">
+                    <div class="benchmark-header">
+                        <h3>GAD-7 Тривожність</h3>
+                        <span class="benchmark-status" id="gad7Status"></span>
+                    </div>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-bar">
+                            <div class="benchmark-your" id="gad7Your"></div>
+                            <div class="benchmark-industry" id="gad7Industry"></div>
+                        </div>
+                        <div class="benchmark-values">
+                            <span>Ви: <strong id="gad7YourValue">--</strong></span>
+                            <span>Індустрія: <strong>7.5</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benchmark-card">
+                    <div class="benchmark-header">
+                        <h3>MBI Вигорання</h3>
+                        <span class="benchmark-status" id="mbiStatus"></span>
+                    </div>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-bar">
+                            <div class="benchmark-your" id="mbiYour"></div>
+                            <div class="benchmark-industry" id="mbiIndustry"></div>
+                        </div>
+                        <div class="benchmark-values">
+                            <span>Ви: <strong id="mbiYourValue">--</strong></span>
+                            <span>Індустрія: <strong>42</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benchmark-card">
+                    <div class="benchmark-header">
+                        <h3>Рівень стресу</h3>
+                        <span class="benchmark-status" id="stressStatus"></span>
+                    </div>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-bar">
+                            <div class="benchmark-your" id="stressYour"></div>
+                            <div class="benchmark-industry" id="stressIndustry"></div>
+                        </div>
+                        <div class="benchmark-values">
+                            <span>Ви: <strong id="stressYourValue">--</strong></span>
+                            <span>Індустрія: <strong>18</strong></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Forecast -->
+        <section class="forecast-section">
+            <h2 class="section-title">Прогноз на наступний місяць</h2>
+            <div class="forecast-warning">
+                <p>⚠️ Прогноз базується на поточній динаміці без втручань</p>
+            </div>
+            <div class="forecast-grid" id="forecastGrid">
+                <!-- Filled by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Sleep Debt Analysis -->
+        <section class="sleep-debt-section">
+            <h2 class="section-title">Аналіз боргу сну</h2>
+            <div class="sleep-debt-summary">
+                <div class="sleep-debt-stat">
+                    <div class="stat-value" id="totalSleepDebt">--</div>
+                    <div class="stat-label">Загальний борг сну команди (годин)</div>
+                </div>
+                <div class="sleep-debt-stat">
+                    <div class="stat-value" id="avgSleepDebt">--</div>
+                    <div class="stat-label">Середній борг на людину (год/тиждень)</div>
+                </div>
+                <div class="sleep-debt-stat">
+                    <div class="stat-value" id="atRiskCount">--</div>
+                    <div class="stat-label">Кількість людей в зоні ризику</div>
+                </div>
+            </div>
+            <div class="sleep-debt-chart">
+                <canvas id="sleepDebtChart"></canvas>
+            </div>
+            <div class="sleep-debt-citation">
+                <p><strong>Дослідження Stanford/McKinsey:</strong> Працівники з недостатнім сном мають 70% вищий ризик вигорання та на 45% нижчу продуктивність.</p>
+            </div>
+        </section>
+
+        <!-- ROI Calculator -->
+        <section class="roi-section">
+            <h2 class="section-title">ROI Calculator - Потенційна економія</h2>
+            <div class="roi-grid">
+                <div class="roi-card">
+                    <div class="roi-label">Покращення сну</div>
+                    <div class="roi-value" id="roiSleep">+1.2 год/день</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-label">Зростання продуктивності</div>
+                    <div class="roi-value" id="roiProductivity">+18%</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-label">Зниження вигорання</div>
+                    <div class="roi-value" id="roiBurnout">-35%</div>
+                </div>
+                <div class="roi-card roi-highlight">
+                    <div class="roi-label">Річна економія компанії</div>
+                    <div class="roi-value" id="roiSavings">$125,000</div>
+                </div>
+            </div>
+        </section>
 
         <!-- Personalized Recommendations -->
-        <div class="analytics-card" style="margin-bottom: 2rem;">
-            <h2 class="card-title">💡 Персоналізовані Рекомендації</h2>
-            <div id="recommendations">
-                <!-- Populated by JavaScript -->
+        <section class="recommendations-section">
+            <h2 class="section-title">Персоналізовані рекомендації</h2>
+            <div class="recommendations-grid" id="recommendationsGrid">
+                <!-- Filled by JavaScript -->
             </div>
-        </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 TeamPulse Mindguard AI. Всі права захищені.</p>
+        </footer>
     </div>
 
-    <script>
-        // Sample data (in real app, this would come from API)
-        const teamData = {
-            employees: [
-                {
-                    name: 'Олексій Коваленко',
-                    metrics: { who5: 68, phq9: 8, gad7: 7, mbi: 28, sleepDuration: 7.2, sleepQuality: 7, workLifeBalance: 6, stressLevel: 6 }
-                },
-                {
-                    name: 'Марія Шевченко',
-                    metrics: { who5: 72, phq9: 6, gad7: 5, mbi: 24, sleepDuration: 7.5, sleepQuality: 8, workLifeBalance: 7, stressLevel: 5 }
-                },
-                {
-                    name: 'Дмитро Петренко',
-                    metrics: { who5: 45, phq9: 14, gad7: 12, mbi: 42, sleepDuration: 5.8, sleepQuality: 4, workLifeBalance: 4, stressLevel: 8 }
-                },
-                {
-                    name: 'Олена Іваненко',
-                    metrics: { who5: 78, phq9: 4, gad7: 3, mbi: 18, sleepDuration: 8.0, sleepQuality: 9, workLifeBalance: 8, stressLevel: 3 }
-                },
-                {
-                    name: 'Андрій Мельник',
-                    metrics: { who5: 52, phq9: 11, gad7: 10, mbi: 38, sleepDuration: 6.2, sleepQuality: 5, workLifeBalance: 5, stressLevel: 7 }
-                },
-                {
-                    name: 'Тетяна Бондаренко',
-                    metrics: { who5: 64, phq9: 7, gad7: 6, mbi: 26, sleepDuration: 7.0, sleepQuality: 7, workLifeBalance: 6, stressLevel: 6 }
-                },
-                {
-                    name: 'Ігор Ткаченко',
-                    metrics: { who5: 70, phq9: 5, gad7: 4, mbi: 22, sleepDuration: 7.3, sleepQuality: 8, workLifeBalance: 7, stressLevel: 5 }
-                },
-                {
-                    name: 'Наталія Савченко',
-                    metrics: { who5: 58, phq9: 9, gad7: 8, mbi: 32, sleepDuration: 6.5, sleepQuality: 6, workLifeBalance: 5, stressLevel: 7 }
-                }
-            ]
-        };
-
-        // Calculate team health score
-        function calculateHealthScore() {
-            const employees = teamData.employees;
-            let totalScore = 0;
-
-            employees.forEach(emp => {
-                const who5Score = emp.metrics.who5;
-                const phq9Score = Math.max(0, 100 - (emp.metrics.phq9 / 27 * 100));
-                const gad7Score = Math.max(0, 100 - (emp.metrics.gad7 / 21 * 100));
-                const mbiScore = Math.max(0, 100 - (emp.metrics.mbi / 60 * 100));
-                const sleepScore = Math.min(100, (emp.metrics.sleepDuration / 8) * 100);
-                const balanceScore = (emp.metrics.workLifeBalance / 10) * 100;
-                const stressScore = Math.max(0, 100 - (emp.metrics.stressLevel / 10 * 100));
-
-                const empScore = (who5Score + phq9Score + gad7Score + mbiScore + sleepScore + balanceScore + stressScore) / 7;
-                totalScore += empScore;
-            });
-
-            return Math.round(totalScore / employees.length);
-        }
-
-        // Calculate averages
-        function calculateAverages() {
-            const employees = teamData.employees;
-            const sum = employees.reduce((acc, emp) => {
-                Object.keys(emp.metrics).forEach(key => {
-                    acc[key] = (acc[key] || 0) + emp.metrics[key];
-                });
-                return acc;
-            }, {});
-
-            const averages = {};
-            Object.keys(sum).forEach(key => {
-                averages[key] = sum[key] / employees.length;
-            });
-
-            return averages;
-        }
-
-        // Initialize analytics
-        function initializeAnalytics() {
-            const healthScore = calculateHealthScore();
-            const averages = calculateAverages();
-
-            // Health Score
-            document.getElementById('healthScore').textContent = healthScore;
-            setTimeout(() => {
-                document.getElementById('healthProgress').style.width = healthScore + '%';
-            }, 100);
-
-            // Industry Benchmarks
-            const industryAvg = { who5: 58, phq9: 8, gad7: 7, mbi: 30 };
-            document.getElementById('who5Benchmark').textContent =
-                averages.who5 >= industryAvg.who5 ? `↑ ${(averages.who5 - industryAvg.who5).toFixed(1)} вище середнього` : `↓ ${(industryAvg.who5 - averages.who5).toFixed(1)} нижче середнього`;
-            document.getElementById('phq9Benchmark').textContent =
-                averages.phq9 <= industryAvg.phq9 ? `↓ ${(industryAvg.phq9 - averages.phq9).toFixed(1)} краще середнього` : `↑ ${(averages.phq9 - industryAvg.phq9).toFixed(1)} гірше середнього`;
-            document.getElementById('gad7Benchmark').textContent =
-                averages.gad7 <= industryAvg.gad7 ? `↓ ${(industryAvg.gad7 - averages.gad7).toFixed(1)} краще середнього` : `↑ ${(averages.gad7 - industryAvg.gad7).toFixed(1)} гірше середнього`;
-            document.getElementById('mbiBenchmark').textContent =
-                averages.mbi <= industryAvg.mbi ? `↓ ${(industryAvg.mbi - averages.mbi).toFixed(1)} краще середнього` : `↑ ${(averages.mbi - industryAvg.mbi).toFixed(1)} гірше середнього`;
-
-            // Sleep Debt
-            const idealSleep = 7.5;
-            const sleepDebt = Math.max(0, (idealSleep - averages.sleepDuration) * 7);
-            document.getElementById('sleepDebt').textContent = sleepDebt.toFixed(1);
-
-            // Forecast
-            generateForecast(averages);
-
-            // Recommendations
-            generateRecommendations(averages);
-
-            // Charts
-            initializeCharts();
-        }
-
-        // Generate forecast
-        function generateForecast(averages) {
-            const forecasts = [];
-
-            if (averages.who5 < 60) {
-                forecasts.push({
-                    type: 'negative',
-                    title: 'Прогноз зниження благополуччя',
-                    description: 'При поточних показниках WHO-5, очікується подальше зниження на 5-8% протягом наступних 2 місяців без втручання.'
-                });
-            } else {
-                forecasts.push({
-                    type: 'positive',
-                    title: 'Стабільне благополуччя',
-                    description: 'Показники WHO-5 в нормі, очікується стабільність при збереженні поточних практик.'
-                });
-            }
-
-            if (averages.sleepDuration < 7) {
-                forecasts.push({
-                    type: 'negative',
-                    title: 'Накопичення дефіциту сну',
-                    description: 'Недостатня тривалість сну може призвести до зниження продуктивності на 15-20% та підвищення ризику вигорання.'
-                });
-            }
-
-            if (averages.stressLevel > 6) {
-                forecasts.push({
-                    type: 'neutral',
-                    title: 'Підвищений стрес потребує уваги',
-                    description: 'Рекомендується впровадження програм зниження стресу для запобігання погіршення показників.'
-                });
-            } else {
-                forecasts.push({
-                    type: 'positive',
-                    title: 'Контрольований рівень стресу',
-                    description: 'Поточні показники стресу в прийнятних межах.'
-                });
-            }
-
-            const forecastHTML = forecasts.map(f => `
-                <div class="forecast-item ${f.type}">
-                    <div class="forecast-title">${f.title}</div>
-                    <div class="forecast-description">${f.description}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('forecastItems').innerHTML = forecastHTML;
-        }
-
-        // Generate recommendations
-        function generateRecommendations(averages) {
-            const recommendations = [];
-
-            if (averages.sleepDuration < 7) {
-                recommendations.push({
-                    icon: '😴',
-                    title: 'Програма покращення якості сну',
-                    content: 'Впровадити навчання з гігієни сну, рекомендувати додатки для медитації та релаксації. Розглянути можливість гнучкого графіку для співробітників з проблемами сну.',
-                    telegram: '😴 Програма сну\n\nРекомендації для команди:\n- Регулярний режим сну\n- Обмеження екранного часу перед сном\n- Медитація та релаксація\n- Гнучкий графік для краще адаптації'
-                });
-            }
-
-            if (averages.stressLevel > 6) {
-                recommendations.push({
-                    icon: '🧘',
-                    title: 'Управління стресом',
-                    content: 'Організувати тренінги з управління стресом, впровадити щотижневі сесії йоги або медитації, створити зону релаксації в офісі.',
-                    telegram: '🧘 Управління стресом\n\nПлан дій:\n- Тренінги з управління стресом\n- Щотижневі сесії йоги/медитації\n- Зона релаксації в офісі\n- Регулярні перерви'
-                });
-            }
-
-            if (averages.workLifeBalance < 6) {
-                recommendations.push({
-                    icon: '⚖️',
-                    title: 'Покращення Work-Life балансу',
-                    content: 'Впровадити політику "право на відключення", гнучкий графік, дні віддаленої роботи. Організувати тімбілдінги та корпоративні заходи.',
-                    telegram: '⚖️ Work-Life баланс\n\nРекомендації:\n- Право на відключення після робочого дня\n- Гнучкий графік роботи\n- Дні віддаленої роботи\n- Тімбілдінги та корпоративи'
-                });
-            }
-
-            const atRiskCount = teamData.employees.filter(emp =>
-                emp.metrics.who5 < 50 || emp.metrics.phq9 > 10 || emp.metrics.gad7 > 10 || emp.metrics.mbi > 35
-            ).length;
-
-            if (atRiskCount > 0) {
-                recommendations.push({
-                    icon: '👨‍⚕️',
-                    title: 'Індивідуальна психологічна підтримка',
-                    content: `${atRiskCount} співробітників потребують індивідуальних консультацій з психологом. Рекомендується організувати конфіденційні сесії та розробити персональні плани підтримки.`,
-                    telegram: `👨‍⚕️ Психологічна підтримка\n\n${atRiskCount} співробітників потребують уваги:\n- Конфіденційні консультації\n- Персональні плани підтримки\n- Регулярний моніторинг стану\n- Анонімна гаряча лінія`
-                });
-            }
-
-            const recommendationsHTML = recommendations.map(r => `
-                <div class="recommendation-card">
-                    <div class="recommendation-header">
-                        <div class="recommendation-icon">${r.icon}</div>
-                        <div class="recommendation-title">${r.title}</div>
-                    </div>
-                    <div class="recommendation-content">${r.content}</div>
-                    ${r.telegram ? `<button class="copy-btn" onclick="copyToClipboard(\`${r.telegram.replace(/`/g, '\\`')}\`)">📋 Копіювати для Telegram</button>` : ''}
-                </div>
-            `).join('');
-
-            document.getElementById('recommendations').innerHTML = recommendationsHTML;
-        }
-
-        // Copy to clipboard
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Скопійовано в буфер обміну!');
-            });
-        }
-
-        // Initialize charts
-        function initializeCharts() {
-            const averages = calculateAverages();
-
-            // Sleep Chart
-            const sleepCtx = document.getElementById('sleepChart').getContext('2d');
-            new Chart(sleepCtx, {
-                type: 'bar',
-                data: {
-                    labels: teamData.employees.map(e => e.name.split(' ')[0]),
-                    datasets: [{
-                        label: 'Тривалість сну (год)',
-                        data: teamData.employees.map(e => e.metrics.sleepDuration),
-                        backgroundColor: teamData.employees.map(e =>
-                            e.metrics.sleepDuration >= 7 ? 'rgba(34, 197, 94, 0.5)' :
-                            e.metrics.sleepDuration >= 6 ? 'rgba(251, 191, 36, 0.5)' :
-                            'rgba(239, 68, 68, 0.5)'
-                        ),
-                        borderColor: teamData.employees.map(e =>
-                            e.metrics.sleepDuration >= 7 ? '#22c55e' :
-                            e.metrics.sleepDuration >= 6 ? '#fbbf24' :
-                            '#ef4444'
-                        ),
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10,
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-
-            // Stress Distribution Chart
-            const stressCtx = document.getElementById('stressChart').getContext('2d');
-            const stressDistribution = {
-                low: teamData.employees.filter(e => e.metrics.stressLevel <= 5).length,
-                medium: teamData.employees.filter(e => e.metrics.stressLevel > 5 && e.metrics.stressLevel <= 7).length,
-                high: teamData.employees.filter(e => e.metrics.stressLevel > 7).length
-            };
-
-            new Chart(stressCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Низький (0-5)', 'Середній (6-7)', 'Високий (8-10)'],
-                    datasets: [{
-                        data: [stressDistribution.low, stressDistribution.medium, stressDistribution.high],
-                        backgroundColor: [
-                            'rgba(34, 197, 94, 0.5)',
-                            'rgba(251, 191, 36, 0.5)',
-                            'rgba(239, 68, 68, 0.5)'
-                        ],
-                        borderColor: [
-                            '#22c55e',
-                            '#fbbf24',
-                            '#ef4444'
-                        ],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#cbd5e1',
-                                padding: 15
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initialize on load
-        initializeAnalytics();
-    </script>
+    <script src="/js/advanced.js"></script>
 </body>
 </html>

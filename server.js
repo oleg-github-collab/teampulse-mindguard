@@ -75,6 +75,11 @@ app.get('/api/metrics', (req, res) => {
   res.json(metrics);
 });
 
+app.get('/api/employee-data', (req, res) => {
+  const teamData = require('./data/team-data.json');
+  res.json(teamData);
+});
+
 // Calculate team metrics
 function calculateMetrics(data) {
   const employees = data.employees;

@@ -13,6 +13,7 @@
         <header>
             <h1 class="header-title">TeamPulse Mindguard AI для OpsLab</h1>
             <nav class="header-nav">
+                <a href="/advanced.html" class="nav-btn">Advanced Analytics</a>
                 <button class="logout-btn" onclick="handleLogout()">Вийти</button>
             </nav>
         </header>
@@ -137,23 +138,11 @@
 
         <!-- Charts Section -->
         <section class="charts-section">
-            <h2 class="section-title">Аналітика показників</h2>
-            <div class="charts-grid">
+            <h2 class="section-title">Динаміка команди (Серпень - Листопад)</h2>
+            <div class="team-trend-container">
                 <div class="chart-card">
-                    <h3 class="chart-title">Динаміка психічного здоров'я</h3>
-                    <canvas id="mentalHealthChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 class="chart-title">Показники сну</h3>
-                    <canvas id="sleepChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 class="chart-title">Розподіл ризиків вигорання</h3>
-                    <canvas id="burnoutDistributionChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 class="chart-title">Стрес та баланс життя</h3>
-                    <canvas id="stressBalanceChart"></canvas>
+                    <h3 class="chart-title">Середні показники команди</h3>
+                    <canvas id="teamTrendChart"></canvas>
                 </div>
             </div>
         </section>
@@ -203,6 +192,35 @@
         </footer>
     </div>
 
+    <!-- Employee Details Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeEmployeeModal()">&times;</span>
+            <h2 id="modalEmployeeName" class="modal-title"></h2>
+            <p id="modalEmployeePosition" class="modal-subtitle"></p>
+
+            <div class="modal-metrics">
+                <h3>Поточні показники</h3>
+                <div class="modal-metrics-grid" id="modalMetrics"></div>
+            </div>
+
+            <div class="modal-chart">
+                <h3>Динаміка за 4 місяці</h3>
+                <canvas id="modalTrendChart"></canvas>
+            </div>
+
+            <div class="modal-risk">
+                <h3>Рівень ризику</h3>
+                <p id="modalRiskLevel"></p>
+            </div>
+
+            <div class="modal-notes">
+                <h3>Примітки</h3>
+                <p id="modalNotes"></p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let currentMonth = 10; // October by default
@@ -250,7 +268,7 @@
 
             const monthData = getMonthData();
             updateMetrics(monthData);
-            updateCharts(monthData);
+            updateTeamTrendChart();
             updateEmployeeTable(monthData);
             updateRiskAssessment(monthData);
         }
@@ -341,52 +359,59 @@
             element.className = 'risk-indicator risk-' + riskLevel;
         }
 
-        // Update charts
-        function updateCharts(data) {
-            if (!data || !data.employees) return;
+        // Update Team Trend Chart (4 months)
+        function updateTeamTrendChart() {
+            if (!teamData || !teamData.months) return;
 
-            updateMentalHealthChart(data);
-            updateSleepChart(data);
-            updateBurnoutDistributionChart(data);
-            updateStressBalanceChart(data);
-        }
+            const ctx = document.getElementById('teamTrendChart').getContext('2d');
 
-        // Mental Health Chart
-        function updateMentalHealthChart(data) {
-            const ctx = document.getElementById('mentalHealthChart').getContext('2d');
-
-            if (charts.mentalHealth) {
-                charts.mentalHealth.destroy();
+            if (charts.teamTrend) {
+                charts.teamTrend.destroy();
             }
 
-            charts.mentalHealth = new Chart(ctx, {
+            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад'];
+            const allMonths = teamData.months;
+
+            charts.teamTrend = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.employees.map(e => e.name),
+                    labels: months,
                     datasets: [
                         {
                             label: 'WHO-5 Благополуччя',
-                            data: data.employees.map(e => e.who5),
+                            data: allMonths.map(m => m.averages.who5),
                             borderColor: '#22c55e',
                             backgroundColor: 'rgba(34, 197, 94, 0.1)',
                             tension: 0.4,
-                            fill: true
+                            fill: false,
+                            borderWidth: 3
                         },
                         {
-                            label: 'PHQ-9 Депресія (інверс.)',
-                            data: data.employees.map(e => 27 - e.phq9), // Invert for better visualization
+                            label: 'PHQ-9 Депресія',
+                            data: allMonths.map(m => m.averages.phq9),
                             borderColor: '#f59e0b',
                             backgroundColor: 'rgba(251, 191, 36, 0.1)',
                             tension: 0.4,
-                            fill: true
+                            fill: false,
+                            borderWidth: 3
                         },
                         {
-                            label: 'GAD-7 Тривожність (інверс.)',
-                            data: data.employees.map(e => 21 - e.gad7), // Invert for better visualization
+                            label: 'GAD-7 Тривожність',
+                            data: allMonths.map(m => m.averages.gad7),
                             borderColor: '#ef4444',
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
                             tension: 0.4,
-                            fill: true
+                            fill: false,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'MBI Вигорання (%)',
+                            data: allMonths.map(m => m.averages.mbi),
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: 3
                         }
                     ]
                 },
@@ -395,224 +420,33 @@
                     maintainAspectRatio: true,
                     plugins: {
                         legend: {
-                            labels: {
-                                color: '#e2e8f0'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#cbd5e1'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#cbd5e1'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Sleep Chart
-        function updateSleepChart(data) {
-            const ctx = document.getElementById('sleepChart').getContext('2d');
-
-            if (charts.sleep) {
-                charts.sleep.destroy();
-            }
-
-            charts.sleep = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.employees.map(e => e.name),
-                    datasets: [
-                        {
-                            label: 'Тривалість сну (год)',
-                            data: data.employees.map(e => e.sleepDuration),
-                            backgroundColor: '#6366f1',
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Якість сну (1-10)',
-                            data: data.employees.map(e => e.sleepQuality),
-                            backgroundColor: '#8b5cf6',
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#e2e8f0'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            position: 'left',
-                            beginAtZero: true,
-                            max: 12,
-                            title: {
-                                display: true,
-                                text: 'Години',
-                                color: '#cbd5e1'
-                            },
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#cbd5e1'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            position: 'right',
-                            beginAtZero: true,
-                            max: 10,
-                            title: {
-                                display: true,
-                                text: 'Якість (1-10)',
-                                color: '#cbd5e1'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            },
-                            ticks: {
-                                color: '#cbd5e1'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(99, 102, 241, 0.1)'
-                            },
-                            ticks: {
-                                color: '#cbd5e1'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Burnout Distribution Chart
-        function updateBurnoutDistributionChart(data) {
-            const ctx = document.getElementById('burnoutDistributionChart').getContext('2d');
-
-            if (charts.burnout) {
-                charts.burnout.destroy();
-            }
-
-            // Count employees by burnout risk level
-            const counts = { low: 0, medium: 0, high: 0 };
-            data.employees.forEach(e => {
-                const risk = getRiskLevel('mbi', e.mbi);
-                counts[risk]++;
-            });
-
-            charts.burnout = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Низький ризик', 'Середній ризик', 'Високий ризик'],
-                    datasets: [{
-                        data: [counts.low, counts.medium, counts.high],
-                        backgroundColor: [
-                            'rgba(34, 197, 94, 0.8)',
-                            'rgba(251, 191, 36, 0.8)',
-                            'rgba(239, 68, 68, 0.8)'
-                        ],
-                        borderColor: [
-                            '#22c55e',
-                            '#fbbf24',
-                            '#ef4444'
-                        ],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
                             labels: {
                                 color: '#e2e8f0',
-                                padding: 15
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Stress and Balance Chart
-        function updateStressBalanceChart(data) {
-            const ctx = document.getElementById('stressBalanceChart').getContext('2d');
-
-            if (charts.stressBalance) {
-                charts.stressBalance.destroy();
-            }
-
-            charts.stressBalance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: data.employees.map(e => e.name),
-                    datasets: [
-                        {
-                            label: 'Баланс життя (1-10)',
-                            data: data.employees.map(e => e.workLifeBalance),
-                            borderColor: '#22c55e',
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            pointBackgroundColor: '#22c55e'
+                                font: { size: 13 }
+                            },
+                            position: 'top'
                         },
-                        {
-                            label: 'Стрес (інверс., 0-40)',
-                            data: data.employees.map(e => (40 - e.stressLevel) / 4), // Normalize and invert
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            pointBackgroundColor: '#ef4444'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#e2e8f0'
-                            }
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
                         }
                     },
                     scales: {
-                        r: {
+                        y: {
                             beginAtZero: true,
-                            max: 10,
                             grid: {
-                                color: 'rgba(99, 102, 241, 0.2)'
+                                color: 'rgba(99, 102, 241, 0.1)'
                             },
                             ticks: {
-                                color: '#cbd5e1',
-                                backdropColor: 'transparent'
+                                color: '#cbd5e1'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(99, 102, 241, 0.1)'
                             },
-                            pointLabels: {
-                                color: '#cbd5e1',
-                                font: {
-                                    size: 11
-                                }
+                            ticks: {
+                                color: '#cbd5e1'
                             }
                         }
                     }
@@ -653,7 +487,7 @@
                 }
 
                 row.innerHTML = `
-                    <td class="employee-name">${emp.name}</td>
+                    <td class="employee-name clickable" onclick="openEmployeeModal('${emp.name}')">${emp.name}</td>
                     <td class="score-cell ${getScoreClass('who5', emp.who5)}">${emp.who5.toFixed(1)}</td>
                     <td class="score-cell ${getScoreClass('phq9', emp.phq9)}">${emp.phq9.toFixed(1)}</td>
                     <td class="score-cell ${getScoreClass('gad7', emp.gad7)}">${emp.gad7.toFixed(1)}</td>
@@ -868,6 +702,167 @@
             `;
             errorDiv.textContent = message;
             container.insertBefore(errorDiv, container.firstChild);
+        }
+
+        // Modal functions
+        let modalChart = null;
+
+        async function openEmployeeModal(employeeName) {
+            // Load full employee data
+            const response = await fetch('/api/employee-data');
+            const fullData = await response.json();
+
+            const employee = fullData.employees.find(e => e.name === employeeName);
+            if (!employee) return;
+
+            // Populate modal
+            document.getElementById('modalEmployeeName').textContent = employee.name;
+            document.getElementById('modalEmployeePosition').textContent = employee.position;
+
+            // Current metrics
+            const metricsHtml = `
+                <div class="modal-metric">
+                    <span class="metric-label">WHO-5:</span>
+                    <span class="metric-value ${getScoreClass('who5', employee.metrics.who5)}">${employee.metrics.who5}</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">PHQ-9:</span>
+                    <span class="metric-value ${getScoreClass('phq9', employee.metrics.phq9)}">${employee.metrics.phq9}</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">GAD-7:</span>
+                    <span class="metric-value ${getScoreClass('gad7', employee.metrics.gad7)}">${employee.metrics.gad7}</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">MBI:</span>
+                    <span class="metric-value ${getScoreClass('mbi', employee.metrics.mbi)}">${employee.metrics.mbi.toFixed(1)}%</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">Сон:</span>
+                    <span class="metric-value ${getScoreClass('sleepDuration', employee.metrics.sleepDuration)}">${employee.metrics.sleepDuration.toFixed(1)} год</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">Якість сну:</span>
+                    <span class="metric-value ${getScoreClass('sleepQuality', employee.metrics.sleepQuality)}">${employee.metrics.sleepQuality}</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">Баланс:</span>
+                    <span class="metric-value ${getScoreClass('workLifeBalance', employee.metrics.workLifeBalance)}">${employee.metrics.workLifeBalance}</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="metric-label">Стрес:</span>
+                    <span class="metric-value ${getScoreClass('stressLevel', employee.metrics.stressLevel)}">${employee.metrics.stressLevel}</span>
+                </div>
+            `;
+            document.getElementById('modalMetrics').innerHTML = metricsHtml;
+
+            // Risk level
+            document.getElementById('modalRiskLevel').innerHTML = `
+                <span class="risk-indicator risk-${employee.riskLevel}">${getRiskLabel(employee.riskLevel)}</span>
+            `;
+
+            // Notes
+            document.getElementById('modalNotes').textContent = employee.notes;
+
+            // Create trend chart
+            createModalTrendChart(employee);
+
+            // Show modal
+            document.getElementById('employeeModal').style.display = 'flex';
+        }
+
+        function createModalTrendChart(employee) {
+            const ctx = document.getElementById('modalTrendChart').getContext('2d');
+
+            if (modalChart) {
+                modalChart.destroy();
+            }
+
+            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад'];
+            const history = employee.history;
+
+            modalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'WHO-5',
+                            data: [history.august.who5, history.september.who5, history.october.who5, history.november.who5],
+                            borderColor: '#22c55e',
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'PHQ-9',
+                            data: [history.august.phq9, history.september.phq9, history.october.phq9, history.november.phq9],
+                            borderColor: '#f59e0b',
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'GAD-7',
+                            data: [history.august.gad7, history.september.gad7, history.october.gad7, history.november.gad7],
+                            borderColor: '#ef4444',
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'MBI',
+                            data: [history.august.mbi, history.september.mbi, history.october.mbi, history.november.mbi],
+                            borderColor: '#8b5cf6',
+                            tension: 0.4,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(99, 102, 241, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(99, 102, 241, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').style.display = 'none';
+            if (modalChart) {
+                modalChart.destroy();
+                modalChart = null;
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('employeeModal');
+            if (event.target === modal) {
+                closeEmployeeModal();
+            }
         }
     </script>
 </body>
