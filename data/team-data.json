@@ -1,0 +1,631 @@
+{
+  "company": "OpsLab",
+  "lastUpdated": "2025-12-01",
+  "employees": [
+    {
+      "id": 1,
+      "code": "1122",
+      "name": "Катерина Петухова",
+      "email": "kateryna.petukhova@opslab.uk",
+      "position": "Team Lead",
+      "metrics": {
+        "who5": 48,
+        "phq9": 13,
+        "gad7": 11,
+        "mbi": 44.44,
+        "sleepDuration": 6.2,
+        "sleepQuality": 5,
+        "workLifeBalance": 5,
+        "stressLevel": 16
+      },
+      "history": {
+        "august": {
+          "who5": 72,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 12
+        },
+        "september": {
+          "who5": 40,
+          "phq9": 14,
+          "gad7": 15,
+          "mbi": 33.33,
+          "sleepDuration": 6.5,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "october": {
+          "who5": 48,
+          "phq9": 14,
+          "gad7": 0,
+          "mbi": 44.44,
+          "sleepDuration": 6.3,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 15
+        },
+        "november": {
+          "who5": 48,
+          "phq9": 13,
+          "gad7": 11,
+          "mbi": 44.44,
+          "sleepDuration": 6.2,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 16
+        }
+      },
+      "riskLevel": "high",
+      "notes": "Високий рівень стресу та вигорання. Критичне погіршення з серпня. Потребує термінової підтримки."
+    },
+    {
+      "id": 2,
+      "code": "6738",
+      "name": "Іванна Сакало",
+      "email": "ivanna.sakalo@opslab.uk",
+      "position": "Product Manager",
+      "metrics": {
+        "who5": 72,
+        "phq9": 8,
+        "gad7": 5,
+        "mbi": 22.22,
+        "sleepDuration": 7.2,
+        "sleepQuality": 7,
+        "workLifeBalance": 7,
+        "stressLevel": 10
+      },
+      "history": {
+        "august": {
+          "who5": 60,
+          "phq9": 2,
+          "gad7": 0,
+          "mbi": 45,
+          "sleepDuration": 6.8,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 14
+        },
+        "september": {
+          "who5": 44,
+          "phq9": 7,
+          "gad7": 10,
+          "mbi": 16.67,
+          "sleepDuration": 6.5,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 16
+        },
+        "october": {
+          "who5": 36,
+          "phq9": 11,
+          "gad7": 14,
+          "mbi": 22.22,
+          "sleepDuration": 6.0,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "november": {
+          "who5": 72,
+          "phq9": 8,
+          "gad7": 5,
+          "mbi": 22.22,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        }
+      },
+      "riskLevel": "low",
+      "notes": "Значне покращення показників у листопаді після критичного стану в жовтні. Відмінна позитивна динаміка!"
+    },
+    {
+      "id": 3,
+      "code": "9267",
+      "name": "Михайло Іващук",
+      "email": "mykhailo.ivashchuk@opslab.uk",
+      "position": "DevOps Engineer",
+      "metrics": {
+        "who5": 56,
+        "phq9": 13,
+        "gad7": 10,
+        "mbi": 44.44,
+        "sleepDuration": 6.0,
+        "sleepQuality": 5,
+        "workLifeBalance": 5,
+        "stressLevel": 15
+      },
+      "history": {
+        "august": {
+          "who5": 52,
+          "phq9": 6,
+          "gad7": 0,
+          "mbi": 62,
+          "sleepDuration": 6.2,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "september": {
+          "who5": 44,
+          "phq9": 17,
+          "gad7": 15,
+          "mbi": 50,
+          "sleepDuration": 5.8,
+          "sleepQuality": 5,
+          "workLifeBalance": 4,
+          "stressLevel": 20
+        },
+        "october": {
+          "who5": 36,
+          "phq9": 9,
+          "gad7": 14,
+          "mbi": 44.44,
+          "sleepDuration": 5.5,
+          "sleepQuality": 4,
+          "workLifeBalance": 4,
+          "stressLevel": 19
+        },
+        "november": {
+          "who5": 56,
+          "phq9": 13,
+          "gad7": 10,
+          "mbi": 44.44,
+          "sleepDuration": 6.0,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 15
+        }
+      },
+      "riskLevel": "high",
+      "notes": "Покращення у листопаді, але показники все ще критичні. Історія тривалого стресу."
+    },
+    {
+      "id": 4,
+      "code": "4747",
+      "name": "Джейн Давидюк",
+      "email": "jane.davydyuk@opslab.uk",
+      "position": "UX Designer",
+      "metrics": {
+        "who5": 90,
+        "phq9": 3,
+        "gad7": 8,
+        "mbi": 11.11,
+        "sleepDuration": 7.8,
+        "sleepQuality": 8,
+        "workLifeBalance": 8,
+        "stressLevel": 5
+      },
+      "history": {
+        "august": {
+          "who5": 0,
+          "phq9": 0,
+          "gad7": 0,
+          "mbi": 0,
+          "sleepDuration": 0,
+          "sleepQuality": 0,
+          "workLifeBalance": 0,
+          "stressLevel": 0
+        },
+        "september": {
+          "who5": 88,
+          "phq9": 2,
+          "gad7": 4,
+          "mbi": 5.56,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 4
+        },
+        "october": {
+          "who5": 88,
+          "phq9": 3,
+          "gad7": 9,
+          "mbi": 11.11,
+          "sleepDuration": 7.7,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 5
+        },
+        "november": {
+          "who5": 90,
+          "phq9": 3,
+          "gad7": 8,
+          "mbi": 11.11,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 5
+        }
+      },
+      "riskLevel": "low",
+      "notes": "Відмінні показники психічного здоров'я. Еталонний work-life баланс. Новий співробітник з вересня."
+    },
+    {
+      "id": 5,
+      "code": "8463",
+      "name": "Оксана Клінчаян",
+      "email": "oksana.klinchaian@opslab.uk",
+      "position": "Backend Developer",
+      "metrics": {
+        "who5": 60,
+        "phq9": 11,
+        "gad7": 8,
+        "mbi": 27.78,
+        "sleepDuration": 6.8,
+        "sleepQuality": 6,
+        "workLifeBalance": 6,
+        "stressLevel": 12
+      },
+      "history": {
+        "august": {
+          "who5": 72,
+          "phq9": 2,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        },
+        "september": {
+          "who5": 64,
+          "phq9": 3,
+          "gad7": 4,
+          "mbi": 33.33,
+          "sleepDuration": 7.0,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 11
+        },
+        "october": {
+          "who5": 72,
+          "phq9": 5,
+          "gad7": 4,
+          "mbi": 27.78,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 11,
+          "gad7": 8,
+          "mbi": 27.78,
+          "sleepDuration": 6.8,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 12
+        }
+      },
+      "riskLevel": "medium",
+      "notes": "Значне погіршення показників у листопаді після покращення у жовтні. Потребує моніторингу."
+    },
+    {
+      "id": 6,
+      "code": "3814",
+      "name": "Ірина М'ячкова",
+      "email": "iryna.miachkova@opslab.uk",
+      "position": "QA Engineer",
+      "metrics": {
+        "who5": 60,
+        "phq9": 7,
+        "gad7": 7,
+        "mbi": 16.67,
+        "sleepDuration": 7.0,
+        "sleepQuality": 7,
+        "workLifeBalance": 7,
+        "stressLevel": 9
+      },
+      "history": {
+        "august": {
+          "who5": 72,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "september": {
+          "who5": 68,
+          "phq9": 4,
+          "gad7": 5,
+          "mbi": 11.11,
+          "sleepDuration": 7.3,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "october": {
+          "who5": 80,
+          "phq9": 7,
+          "gad7": 8,
+          "mbi": 16.67,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 9
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 7,
+          "gad7": 7,
+          "mbi": 16.67,
+          "sleepDuration": 7.0,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 9
+        }
+      },
+      "riskLevel": "low",
+      "notes": "Зниження WHO-5 у листопаді, але інші показники залишаються стабільними."
+    },
+    {
+      "id": 7,
+      "code": "4582",
+      "name": "Вероніка Кухарчук",
+      "email": "veronika.kukharchuk@opslab.uk",
+      "position": "Frontend Developer",
+      "metrics": {
+        "who5": 88,
+        "phq9": 6,
+        "gad7": 3,
+        "mbi": 38.89,
+        "sleepDuration": 7.5,
+        "sleepQuality": 8,
+        "workLifeBalance": 8,
+        "stressLevel": 7
+      },
+      "history": {
+        "august": {
+          "who5": 92,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 30,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 6
+        },
+        "september": {
+          "who5": 60,
+          "phq9": 4,
+          "gad7": 8,
+          "mbi": 38.89,
+          "sleepDuration": 7.0,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 9
+        },
+        "october": {
+          "who5": 48,
+          "phq9": 7,
+          "gad7": 5,
+          "mbi": 38.89,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "november": {
+          "who5": 88,
+          "phq9": 6,
+          "gad7": 3,
+          "mbi": 38.89,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 7
+        }
+      },
+      "riskLevel": "medium",
+      "notes": "Значне покращення WHO-5 у листопаді (+40 пунктів)! Чудове відновлення після падіння в жовтні."
+    },
+    {
+      "id": 8,
+      "code": "1425",
+      "name": "Марія Василик",
+      "email": "mariya.vasylyk@opslab.uk",
+      "position": "Project Manager",
+      "metrics": {
+        "who5": 60,
+        "phq9": 5,
+        "gad7": 5,
+        "mbi": 27.78,
+        "sleepDuration": 7.0,
+        "sleepQuality": 7,
+        "workLifeBalance": 6,
+        "stressLevel": 8
+      },
+      "history": {
+        "august": {
+          "who5": 60,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 45,
+          "sleepDuration": 7.0,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        },
+        "september": {
+          "who5": 64,
+          "phq9": 4,
+          "gad7": 2,
+          "mbi": 33.33,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 9
+        },
+        "october": {
+          "who5": 52,
+          "phq9": 3,
+          "gad7": 3,
+          "mbi": 27.78,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 7
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 5,
+          "gad7": 5,
+          "mbi": 27.78,
+          "sleepDuration": 7.0,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 8
+        }
+      },
+      "riskLevel": "low",
+      "notes": "Стабільні показники з невеликими коливаннями. Покращення MBI протягом періоду."
+    }
+  ],
+  "teamAverages": {
+    "current": {
+      "who5": 66.75,
+      "phq9": 8.25,
+      "gad7": 7.125,
+      "mbi": 29.19,
+      "sleepDuration": 7.06,
+      "sleepQuality": 6.625,
+      "workLifeBalance": 6.5,
+      "stressLevel": 10.25
+    },
+    "august": {
+      "who5": 68.1,
+      "phq9": 2.8,
+      "gad7": 0,
+      "mbi": 46.1,
+      "sleepDuration": 6.85,
+      "sleepQuality": 6.7,
+      "workLifeBalance": 6.6,
+      "stressLevel": 20.6
+    },
+    "september": {
+      "who5": 57.82,
+      "phq9": 6.73,
+      "gad7": 8.0,
+      "mbi": 33.56,
+      "sleepDuration": 6.86,
+      "sleepQuality": 6.45,
+      "workLifeBalance": 5.55,
+      "stressLevel": 17.73
+    },
+    "october": {
+      "who5": 57.5,
+      "phq9": 7.38,
+      "gad7": 7.12,
+      "mbi": 29.17,
+      "sleepDuration": 6.66,
+      "sleepQuality": 6.5,
+      "workLifeBalance": 6.375,
+      "stressLevel": 9.625
+    },
+    "november": {
+      "who5": 66.75,
+      "phq9": 8.25,
+      "gad7": 7.125,
+      "mbi": 29.19,
+      "sleepDuration": 7.06,
+      "sleepQuality": 6.625,
+      "workLifeBalance": 6.5,
+      "stressLevel": 10.25
+    }
+  },
+  "industryBenchmarks": {
+    "techSector": {
+      "who5": 58,
+      "phq9": 8,
+      "gad7": 7,
+      "mbi": 30,
+      "sleepDuration": 6.5,
+      "workLifeBalance": 5.5,
+      "stressLevel": 7
+    }
+  },
+  "alerts": [
+    {
+      "severity": "high",
+      "employee": "Катерина Петухова",
+      "message": "Високий рівень вигорання (44.44%) та стресу. Тривала негативна динаміка з серпня.",
+      "timestamp": "2025-12-01T10:00:00Z"
+    },
+    {
+      "severity": "high",
+      "employee": "Михайло Іващук",
+      "message": "Високий рівень вигорання (44.44%) та підвищена тривожність. Історія критичних показників.",
+      "timestamp": "2025-12-01T10:00:00Z"
+    },
+    {
+      "severity": "medium",
+      "employee": "Оксана Клінчаян",
+      "message": "Різке погіршення у листопаді (PHQ-9: 5→11). Потребує консультації.",
+      "timestamp": "2025-12-01T10:00:00Z"
+    },
+    {
+      "severity": "positive",
+      "employee": "Іванна Сакало",
+      "message": "Видатне покращення! WHO-5: 36→72. Відмінна динаміка відновлення.",
+      "timestamp": "2025-12-01T10:00:00Z"
+    },
+    {
+      "severity": "positive",
+      "employee": "Вероніка Кухарчук",
+      "message": "Значне покращення WHO-5 (+40 пунктів). Успішне відновлення після падіння.",
+      "timestamp": "2025-12-01T10:00:00Z"
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "urgent",
+      "title": "Індивідуальна психологічна підтримка",
+      "description": "2 співробітників з високим вігоранням потребують термінової консультації з психологом",
+      "affectedEmployees": ["Катерина Петухова", "Михайло Іващук"],
+      "priority": "critical"
+    },
+    {
+      "category": "individual",
+      "title": "Підтримка для Оксани Клінчаян",
+      "description": "Різке погіршення показників - потрібна консультація та аналіз причин",
+      "affectedEmployees": ["Оксана Клінчаян"],
+      "priority": "high"
+    },
+    {
+      "category": "positive",
+      "title": "Аналіз успішних практик",
+      "description": "Вивчити фактори успіху Іванни та Вероніки для застосування в команді",
+      "affectedEmployees": ["Іванна Сакало", "Вероніка Кухарчук"],
+      "priority": "medium"
+    },
+    {
+      "category": "general",
+      "title": "Управління стресом",
+      "description": "Середній рівень стресу 10.25 - впровадити програми релаксації",
+      "affectedEmployees": ["all"],
+      "priority": "high"
+    }
+  ],
+  "metadata": {
+    "assessmentTools": [
+      "WHO-5 Well-Being Index (0-100)",
+      "PHQ-9 Patient Health Questionnaire (0-27)",
+      "GAD-7 Generalized Anxiety Disorder (0-21)",
+      "MBI Maslach Burnout Inventory (0-100%)"
+    ],
+    "updateFrequency": "monthly",
+    "nextAssessment": "2025-12-30",
+    "participationRate": "100%",
+    "dataCollectionPeriod": "Серпень-Листопад 2025"
+  }
+}
