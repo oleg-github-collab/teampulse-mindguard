@@ -27,7 +27,9 @@
             <div class="momentum-grid">
                 <div class="chart-card lift">
                     <div class="chart-title">Траєкторія благополуччя</div>
-                    <canvas id="trajectoryChart"></canvas>
+                    <div class="chart-container" style="position: relative; height: 300px; max-height: 300px;">
+                        <canvas id="trajectoryChart"></canvas>
+                    </div>
                     <p class="chart-note">WHO-5, стрес і сон нормовані до 100 для швидкого порівняння</p>
                     <div class="chart-actions">
                         <p class="chart-comment" id="trajectoryComment">Дані оновлюються...</p>
@@ -36,7 +38,9 @@
                 </div>
                 <div class="chart-card lift">
                     <div class="chart-title">Матриця ризиків 1:1</div>
-                    <canvas id="riskBubbleChart"></canvas>
+                    <div class="chart-container" style="position: relative; height: 300px; max-height: 300px;">
+                        <canvas id="riskBubbleChart"></canvas>
+                    </div>
                     <div class="chart-note">Розмір кола = PHQ-9, X = стрес, Y = MBI. Колір = рівень ризику.</div>
                     <div class="chart-actions">
                         <p class="chart-comment" id="riskComment">Дані оновлюються...</p>
@@ -176,7 +180,9 @@
                 </div>
             </div>
             <div class="sleep-debt-chart">
-                <canvas id="sleepDebtChart"></canvas>
+                <div class="chart-container" style="position: relative; height: 400px; max-height: 400px;">
+                    <canvas id="sleepDebtChart"></canvas>
+                </div>
             </div>
             <div class="sleep-debt-citation">
                 <p><strong>Дослідження Stanford/McKinsey:</strong> Працівники з недостатнім сном мають 70% вищий ризик вигорання та на 45% нижчу продуктивність.</p>

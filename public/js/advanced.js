@@ -192,8 +192,7 @@ function renderTrajectoryChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 1.6,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     labels: { color: '#e2e8f0' }
@@ -269,7 +268,6 @@ function renderRiskBubbleChart() {
         y: emp.metrics.mbi,
         r: Math.max(8, emp.metrics.phq9 + 4),
         name: emp.name,
-        position: emp.position,
         risk: emp.riskLevel || 'medium'
     }));
 
@@ -287,8 +285,7 @@ function renderRiskBubbleChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 1.35,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -296,7 +293,7 @@ function renderRiskBubbleChart() {
                         label: (context) => {
                             const raw = context.raw;
                             return [
-                                raw.name + ' · ' + raw.position,
+                                raw.name,
                                 'Стрес: ' + raw.x + '/40',
                                 'MBI: ' + raw.y.toFixed(1) + '%',
                                 'PHQ-9: ' + (raw.r - 4)
@@ -330,7 +327,7 @@ function renderRiskBubbleChart() {
         return acc;
     }, {});
     const topRisk = points.slice().sort((a, b) => (b.y + b.x) - (a.y + a.x))[0];
-    updateText('riskComment', `Ризики: high ${counts.high || 0}, medium ${counts.medium || 0}, low ${counts.low || 0}. Найвищий ризик: ${topRisk?.name || '—'} (${topRisk?.position || ''}).`);
+    updateText('riskComment', `Ризики: high ${counts.high || 0}, medium ${counts.medium || 0}, low ${counts.low || 0}. Найвищий ризик: ${topRisk?.name || '—'}.`);
 
     const modalMetrics = [
         { label: 'High', value: counts.high || 0 },
@@ -433,8 +430,7 @@ function analyzeSleepDebt() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 1.5,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     labels: {
@@ -513,7 +509,7 @@ function renderEmployeeInsights() {
                 topRiskNames ? 'Фокус на працівниках з найвищим MBI/PHQ-9.' : 'Команда без червоних тригерів.',
                 'Уточнити, чи є інші ранні симптоми (сон <6.5 год, PHQ-9>10).'
             ],
-            plan: 'План дій Олега: короткі 12-хв check-in з найризиковішими, нотувати 2 блокери та підтвердити підтримку психолога/коуча з фіксацією follow-up через 7 днів.'
+            plan: 'Олег планує: провести короткі 12-хв check-in з найризиковішими, нотувати 2 блокери та підтвердити підтримку психолога/коуча з фіксацією follow-up через 7 днів.'
         },
         {
             pill: 'RECOVERY',
@@ -524,8 +520,8 @@ function renderEmployeeInsights() {
                 'Важливо зафіксувати, що саме спрацювало.'
             ],
             plan: topRecovery
-                ? 'План дій Олега: провести 15-хв peer sharing з цими людьми, записати 2-3 ритуали та поширити в команді.'
-                : 'План дій Олега: залишити короткі 1:1 раз на 2 тижні для відстеження настрою.'
+                ? 'Олег планує: провести 15-хв peer sharing з цими людьми, записати 2-3 ритуали та поширити в команді.'
+                : 'Олег планує: залишити короткі 1:1 раз на 2 тижні для відстеження настрою.'
         },
         {
             pill: 'DROP',
@@ -535,7 +531,7 @@ function renderEmployeeInsights() {
                 declines ? 'Є падіння WHO-5 — потенційні локальні проблеми.' : 'Без суттєвих спадів — тримати моніторинг.',
                 'Ймовірні причини: пікове навантаження чи недосип.'
             ],
-            plan: 'План дій Олега: перевірити пріоритети, запропонувати buddy з еталонного балансу та закріпити одну зміну в календарі (менше мітингів/гнучкий старт).'
+            plan: 'Олег планує: перевірити пріоритети, запропонувати buddy з еталонного балансу та закріпити одну зміну в календарі (менше мітингів/гнучкий старт).'
         },
         {
             pill: 'SLEEP',
@@ -547,7 +543,7 @@ function renderEmployeeInsights() {
                 sleepDebt.length ? 'Є помітний борг сну — ризик падіння продуктивності.' : 'Сон стабільний — можна підтримувати режим.',
                 'Недосип корелює з вигоранням і PHQ-9.'
             ],
-            plan: 'План дій Олега: підтвердити правило «без пінгів після 19:00», дати гнучкий старт дня та 2 дні з пізнішим стендапом для групи ризику.'
+            plan: 'Олег планує: підтвердити правило «без пінгів після 19:00», дати гнучкий старт дня та 2 дні з пізнішим стендапом для групи ризику.'
         },
         {
             pill: 'BALANCE',
@@ -559,7 +555,7 @@ function renderEmployeeInsights() {
                 'Є еталонні практики work-life balance у команді.',
                 'Ці люди можуть бути buddy/менторами для групи ризику.'
             ],
-            plan: 'План дій Олега: запросити їх як buddy для ризикових колег та задокументувати їхні ритуали у внутрішньому гайді.'
+            plan: 'Олег планує: запросити їх як buddy для ризикових колег та задокументувати їхні ритуали у внутрішньому гайді.'
         }
     ];
 

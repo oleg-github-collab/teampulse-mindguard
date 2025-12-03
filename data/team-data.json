@@ -7,7 +7,6 @@
       "code": "1122",
       "name": "Катерина Петухова",
       "email": "kateryna.petukhova@opslab.uk",
-      "position": "Team Lead",
       "metrics": {
         "who5": 48,
         "phq9": 13,
@@ -68,7 +67,6 @@
       "code": "6738",
       "name": "Іванна Сакало",
       "email": "ivanna.sakalo@opslab.uk",
-      "position": "Product Manager",
       "metrics": {
         "who5": 72,
         "phq9": 8,
@@ -129,7 +127,6 @@
       "code": "9267",
       "name": "Михайло Іващук",
       "email": "mykhailo.ivashchuk@opslab.uk",
-      "position": "DevOps Engineer",
       "metrics": {
         "who5": 56,
         "phq9": 13,
@@ -190,7 +187,6 @@
       "code": "4747",
       "name": "Джейн Давидюк",
       "email": "jane.davydyuk@opslab.uk",
-      "position": "UX Designer",
       "metrics": {
         "who5": 90,
         "phq9": 3,
@@ -251,7 +247,6 @@
       "code": "8463",
       "name": "Оксана Клінчаян",
       "email": "oksana.klinchaian@opslab.uk",
-      "position": "Backend Developer",
       "metrics": {
         "who5": 60,
         "phq9": 11,
@@ -312,7 +307,6 @@
       "code": "3814",
       "name": "Ірина М'ячкова",
       "email": "iryna.miachkova@opslab.uk",
-      "position": "QA Engineer",
       "metrics": {
         "who5": 60,
         "phq9": 7,
@@ -373,7 +367,6 @@
       "code": "4582",
       "name": "Вероніка Кухарчук",
       "email": "veronika.kukharchuk@opslab.uk",
-      "position": "Frontend Developer",
       "metrics": {
         "who5": 88,
         "phq9": 6,
@@ -434,7 +427,6 @@
       "code": "1425",
       "name": "Марія Василик",
       "email": "mariya.vasylyk@opslab.uk",
-      "position": "Project Manager",
       "metrics": {
         "who5": 60,
         "phq9": 5,

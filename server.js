@@ -38,7 +38,6 @@ app.get('/api/team-data', (req, res) => {
       const monthData = emp.history[monthKey];
       return {
         name: emp.name,
-        position: emp.position,
         who5: monthData.who5,
         phq9: monthData.phq9,
         gad7: monthData.gad7,
