@@ -801,8 +801,8 @@
             const data = Object.fromEntries(formData);
 
             try {
-                // ВАЖЛИВО: Замініть цей URL на ваш URL розгортання з Apps Script
-                const APPS_SCRIPT_URL = 'YOUR_DEPLOYMENT_URL_HERE';
+                // Apps Script URL для обробки заявок
+                const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFgzZkN_wQmwVrzB1pMe7gjcKvOhJpu15JSlZebJw39aIGoyVuYKyjwEufZDm80Cew7w/exec';
 
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
