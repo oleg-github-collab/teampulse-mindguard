@@ -15,6 +15,24 @@ const MONTH_LABELS = {
     june: 'Черв',
     july: 'Лип'
 };
+
+// Єдина функція розрахунку рівня ризику на основі метрик
+function calculateEmployeeRisk(metrics) {
+    // Критичні умови
+    const isCritical = metrics.who5 < 28 || metrics.phq9 > 15 || metrics.gad7 > 15;
+    if (isCritical) return 'critical';
+
+    // Високий ризик
+    const isHighRisk = metrics.who5 < 50 || metrics.phq9 > 10 || metrics.gad7 > 10 || metrics.mbi > 40;
+    if (isHighRisk) return 'high';
+
+    // Середній ризик
+    const isMediumRisk = metrics.mbi > 30 || metrics.stressLevel > 20;
+    if (isMediumRisk) return 'medium';
+
+    // Низький ризик
+    return 'low';
+}
 const METRIC_HINTS = {
     who5: 'WHO-5: 0-100, <50 — ризик низького благополуччя',
     phq9: 'PHQ-9: 0-27, >10 — помірна/висока депресивна симптоматика',
@@ -32,6 +50,22 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAdvancedAnalytics();
 });
 
+// Check if we have December data and show notice
+function checkAndShowDecemberNotice() {
+    if (!teamData) return;
+
+    const hasDecemberData = teamData.employees.some(emp =>
+        emp.history && emp.history.december && emp.history.december.who5 > 0
+    );
+
+    if (hasDecemberData) {
+        const noticeEl = document.getElementById('decemberNotice');
+        if (noticeEl) {
+            noticeEl.style.display = 'block';
+        }
+    }
+}
+
 // Load data
 async function loadAdvancedAnalytics() {
     try {
@@ -40,6 +74,9 @@ async function loadAdvancedAnalytics() {
             throw new Error('Failed to fetch data');
         }
         teamData = await response.json();
+
+        // Показати попередження про грудень якщо є дані
+        checkAndShowDecemberNotice();
 
         calculateTeamHealthScore();
         updateBenchmarking();
@@ -305,20 +342,25 @@ function renderRiskBubbleChart() {
 
     const ctx = ctxEl.getContext('2d');
     const colors = {
-        high: { fill: 'rgba(239, 68, 68, 0.65)', border: '#ef4444' },
+        critical: { fill: 'rgba(239, 68, 68, 0.75)', border: '#dc2626' },
+        high: { fill: 'rgba(239, 68, 68, 0.55)', border: '#ef4444' },
         medium: { fill: 'rgba(251, 191, 36, 0.55)', border: '#f59e0b' },
-        low: { fill: 'rgba(34, 197, 94, 0.55)', border: '#22c55e' },
-        positive: { fill: 'rgba(139, 92, 246, 0.55)', border: '#8b5cf6' }
+        low: { fill: 'rgba(34, 197, 94, 0.55)', border: '#22c55e' }
     };
 
-    const points = teamData.employees.map(emp => ({
-        x: emp.metrics.stressLevel,
-        y: emp.metrics.mbi,
-        r: Math.min(26, Math.max(10, emp.metrics.phq9 * 1.2)),
-        phq9: emp.metrics.phq9,
-        name: emp.name,
-        risk: emp.riskLevel || 'medium'
-    }));
+    const points = teamData.employees.map(emp => {
+        const risk = calculateEmployeeRisk(emp.metrics);
+        return {
+            x: emp.metrics.stressLevel,
+            y: emp.metrics.mbi,
+            r: Math.min(26, Math.max(10, emp.metrics.phq9 * 1.2)),
+            phq9: emp.metrics.phq9,
+            who5: emp.metrics.who5,
+            gad7: emp.metrics.gad7,
+            name: emp.name,
+            risk: risk
+        };
+    });
 
     const riskZonesPlugin = {
         id: 'riskZonesPlugin',

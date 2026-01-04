@@ -27,6 +27,13 @@
             <button class="month-btn active" data-month="12" onclick="selectMonth(12)">Грудень</button>
         </div>
 
+        <!-- December Notice -->
+        <div class="december-notice" id="dashboardDecemberNotice" style="display: none; margin: 16px auto; max-width: 1200px; padding: 12px 16px; background: rgba(251, 191, 36, 0.1); border-left: 4px solid #f59e0b; border-radius: 8px;">
+            <p style="margin: 0; font-size: 14px; color: #f59e0b; font-weight: 500;">
+                ⚠️ <strong>Грудень 2025:</strong> Статистично кінець року пов'язаний з підвищеним ризиком вигорання та стресу через підведення підсумків, дедлайни та святкові очікування.
+            </p>
+        </div>
+
         <!-- Metrics Section -->
         <section class="metrics-section">
             <h2 class="section-title">Ключові показники команди</h2>
@@ -265,6 +272,13 @@
                     throw new Error('Failed to fetch data');
                 }
                 teamData = await response.json();
+
+                // Show December notice if current month is December
+                const decemberNotice = document.getElementById('dashboardDecemberNotice');
+                if (decemberNotice && currentMonth === 12) {
+                    decemberNotice.style.display = 'block';
+                }
+
                 updateDashboard();
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -283,6 +297,12 @@
                     btn.classList.add('active');
                 }
             });
+
+            // Show/hide December notice
+            const decemberNotice = document.getElementById('dashboardDecemberNotice');
+            if (decemberNotice) {
+                decemberNotice.style.display = month === 12 ? 'block' : 'none';
+            }
 
             updateDashboard();
         }
