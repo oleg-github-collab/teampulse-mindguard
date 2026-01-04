@@ -23,7 +23,8 @@
             <button class="month-btn" data-month="8" onclick="selectMonth(8)">Серпень</button>
             <button class="month-btn" data-month="9" onclick="selectMonth(9)">Вересень</button>
             <button class="month-btn" data-month="10" onclick="selectMonth(10)">Жовтень</button>
-            <button class="month-btn active" data-month="11" onclick="selectMonth(11)">Листопад</button>
+            <button class="month-btn" data-month="11" onclick="selectMonth(11)">Листопад</button>
+            <button class="month-btn active" data-month="12" onclick="selectMonth(12)">Грудень</button>
         </div>
 
         <!-- Metrics Section -->
@@ -138,7 +139,7 @@
 
         <!-- Charts Section -->
         <section class="charts-section">
-            <h2 class="section-title">Динаміка команди (Серпень - Листопад)</h2>
+            <h2 class="section-title">Динаміка команди (Серпень - Грудень)</h2>
             <div class="team-trend-container">
                 <div class="chart-card">
                     <h3 class="chart-title">Середні показники команди</h3>
@@ -158,7 +159,8 @@
                 <button class="employee-month-btn" data-month="8" onclick="switchEmployeeMonth(8)">Серпень</button>
                 <button class="employee-month-btn" data-month="9" onclick="switchEmployeeMonth(9)">Вересень</button>
                 <button class="employee-month-btn" data-month="10" onclick="switchEmployeeMonth(10)">Жовтень</button>
-                <button class="employee-month-btn active" data-month="11" onclick="switchEmployeeMonth(11)">Листопад</button>
+                <button class="employee-month-btn" data-month="11" onclick="switchEmployeeMonth(11)">Листопад</button>
+                <button class="employee-month-btn active" data-month="12" onclick="switchEmployeeMonth(12)">Грудень</button>
             </div>
 
             <div class="table-container">
@@ -464,7 +466,7 @@
                 charts.teamTrend.destroy();
             }
 
-            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад'];
+            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
             const allMonths = teamData.months;
 
             charts.teamTrend = new Chart(ctx, {
@@ -907,7 +909,7 @@
                 modalChart.destroy();
             }
 
-            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад'];
+            const months = ['Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
             const history = employee.history;
 
             modalChart = new Chart(ctx, {
@@ -918,7 +920,7 @@
                         {
                             label: 'WHO-5',
                             metricKey: 'who5',
-                            data: [history.august.who5, history.september.who5, history.october.who5, history.november.who5],
+                            data: [history.august.who5, history.september.who5, history.october.who5, history.november.who5, history.december.who5],
                             borderColor: '#22c55e',
                             tension: 0.4,
                             borderWidth: 2
@@ -926,7 +928,7 @@
                         {
                             label: 'PHQ-9',
                             metricKey: 'phq9',
-                            data: [history.august.phq9, history.september.phq9, history.october.phq9, history.november.phq9],
+                            data: [history.august.phq9, history.september.phq9, history.october.phq9, history.november.phq9, history.december.phq9],
                             borderColor: '#f59e0b',
                             tension: 0.4,
                             borderWidth: 2
@@ -934,7 +936,7 @@
                         {
                             label: 'GAD-7',
                             metricKey: 'gad7',
-                            data: [history.august.gad7, history.september.gad7, history.october.gad7, history.november.gad7],
+                            data: [history.august.gad7, history.september.gad7, history.october.gad7, history.november.gad7, history.december.gad7],
                             borderColor: '#ef4444',
                             tension: 0.4,
                             borderWidth: 2
@@ -942,7 +944,7 @@
                         {
                             label: 'MBI',
                             metricKey: 'mbi',
-                            data: [history.august.mbi, history.september.mbi, history.october.mbi, history.november.mbi],
+                            data: [history.august.mbi, history.september.mbi, history.october.mbi, history.november.mbi, history.december.mbi],
                             borderColor: '#8b5cf6',
                             tension: 0.4,
                             borderWidth: 2
