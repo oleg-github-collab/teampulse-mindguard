@@ -53,8 +53,12 @@ const CONFIG = {
 
 function doPost(e) {
   try {
+    // Логуємо отримані дані
+    Logger.log('Отримано POST запит: ' + JSON.stringify(e));
+
     // Парсимо дані з форми
     const data = JSON.parse(e.postData.contents);
+    Logger.log('Розпарсені дані: ' + JSON.stringify(data));
 
     // Перевіряємо обов'язкові поля
     if (!data.company || !data.name || !data.email || !data.phone || !data.teamSize) {
@@ -66,12 +70,23 @@ function doPost(e) {
 
     // Зберігаємо заявку в таблицю
     const leadId = saveLead(data);
+    Logger.log('Заявка збережена з ID: ' + leadId);
 
     // Відправляємо email клієнту
-    sendClientEmail(data);
+    try {
+      sendClientEmail(data);
+      Logger.log('Email клієнту відправлено на: ' + data.email);
+    } catch (emailError) {
+      Logger.log('Помилка відправки email клієнту: ' + emailError);
+    }
 
     // Відправляємо email адміністратору
-    sendAdminEmail(data, leadId);
+    try {
+      sendAdminEmail(data, leadId);
+      Logger.log('Email адміністратору відправлено');
+    } catch (emailError) {
+      Logger.log('Помилка відправки email адміністратору: ' + emailError);
+    }
 
     // Оновлюємо статистику
     updateStats(data);
@@ -83,12 +98,42 @@ function doPost(e) {
     });
 
   } catch (error) {
-    Logger.log('Помилка doPost: ' + error);
+    Logger.log('Помилка doPost: ' + error.toString());
+    Logger.log('Stack trace: ' + error.stack);
     return createResponse({
       success: false,
       message: 'Помилка обробки заявки: ' + error.message
     });
   }
+}
+
+// ============================================
+// ТЕСТОВА ФУНКЦІЯ (для перевірки в редакторі)
+// ============================================
+
+function testDoPost() {
+  const testData = {
+    company: 'Test Company',
+    name: 'Тестовий Користувач',
+    email: 'test@example.com',
+    phone: '+380501234567',
+    teamSize: '26-50',
+    message: 'Тестова заявка для перевірки системи'
+  };
+
+  const mockEvent = {
+    postData: {
+      contents: JSON.stringify(testData)
+    }
+  };
+
+  const result = doPost(mockEvent);
+  Logger.log('Результат тесту: ' + result.getContent());
+
+  // Відкриваємо таблицю для перевірки
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  Logger.log('Перевірте аркуш "' + CONFIG.SHEET_NAME + '" - додано новий рядок');
 }
 
 // ============================================
@@ -446,38 +491,54 @@ function sendAdminEmail(data, leadId) {
 // ============================================
 
 function updateStats(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let statsSheet = ss.getSheetByName(CONFIG.STATS_SHEET_NAME);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let statsSheet = ss.getSheetByName(CONFIG.STATS_SHEET_NAME);
 
-  // Створюємо аркуш статистики якщо його немає
-  if (!statsSheet) {
-    statsSheet = ss.insertSheet(CONFIG.STATS_SHEET_NAME);
-    initializeStatsSheet(statsSheet);
-  }
-
-  // Отримуємо поточну дату
-  const today = new Date();
-  const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), 'dd.MM.yyyy');
-
-  // Шукаємо рядок з сьогоднішньою датою
-  const dataRange = statsSheet.getDataRange();
-  const values = dataRange.getValues();
-  let rowFound = false;
-
-  for (let i = 1; i < values.length; i++) {
-    const cellDate = Utilities.formatDate(new Date(values[i][0]), Session.getScriptTimeZone(), 'dd.MM.yyyy');
-    if (cellDate === dateStr) {
-      // Оновлюємо лічильник
-      const currentCount = values[i][1];
-      statsSheet.getRange(i + 1, 2).setValue(currentCount + 1);
-      rowFound = true;
-      break;
+    // Створюємо аркуш статистики якщо його немає
+    if (!statsSheet) {
+      statsSheet = ss.insertSheet(CONFIG.STATS_SHEET_NAME);
+      initializeStatsSheet(statsSheet);
     }
-  }
 
-  // Якщо рядка немає - додаємо новий
-  if (!rowFound) {
-    statsSheet.appendRow([today, 1, data.teamSize]);
+    // Отримуємо поточну дату
+    const today = new Date();
+    const dateStr = Utilities.formatDate(today, Session.getScriptTimeZone(), 'dd.MM.yyyy');
+
+    // Перевіряємо чи є дані в таблиці
+    const lastRow = statsSheet.getLastRow();
+
+    if (lastRow <= 1) {
+      // Немає даних - додаємо перший рядок
+      statsSheet.appendRow([today, 1, data.teamSize]);
+      return;
+    }
+
+    // Шукаємо рядок з сьогоднішньою датою
+    const dataRange = statsSheet.getRange(2, 1, lastRow - 1, 3);
+    const values = dataRange.getValues();
+    let rowFound = false;
+
+    for (let i = 0; i < values.length; i++) {
+      if (values[i][0]) {
+        const cellDate = Utilities.formatDate(new Date(values[i][0]), Session.getScriptTimeZone(), 'dd.MM.yyyy');
+        if (cellDate === dateStr) {
+          // Оновлюємо лічильник
+          const currentCount = values[i][1] || 0;
+          statsSheet.getRange(i + 2, 2).setValue(currentCount + 1);
+          rowFound = true;
+          break;
+        }
+      }
+    }
+
+    // Якщо рядка немає - додаємо новий
+    if (!rowFound) {
+      statsSheet.appendRow([today, 1, data.teamSize]);
+    }
+  } catch (error) {
+    Logger.log('Помилка updateStats: ' + error);
+    // Не блокуємо основний процес якщо статистика не працює
   }
 }
 
