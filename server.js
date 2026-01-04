@@ -19,6 +19,8 @@ app.use(express.static('public'));
 
 // API Routes
 app.get('/api/team-data', (req, res) => {
+  // Clear cache to always get fresh data
+  delete require.cache[require.resolve('./data/team-data.json')];
   const teamData = require('./data/team-data.json');
 
   // Transform data to match dashboard expectations
@@ -26,10 +28,11 @@ app.get('/api/team-data', (req, res) => {
     'august': 8,
     'september': 9,
     'october': 10,
-    'november': 11
+    'november': 11,
+    'december': 12
   };
 
-  const months = ['august', 'september', 'october', 'november'].map(monthKey => {
+  const months = ['august', 'september', 'october', 'november', 'december'].map(monthKey => {
     const monthNum = monthMap[monthKey];
     const averages = teamData.teamAverages[monthKey];
 
@@ -69,12 +72,14 @@ app.get('/api/team-data', (req, res) => {
 });
 
 app.get('/api/metrics', (req, res) => {
+  delete require.cache[require.resolve('./data/team-data.json')];
   const teamData = require('./data/team-data.json');
   const metrics = calculateMetrics(teamData);
   res.json(metrics);
 });
 
 app.get('/api/employee-data', (req, res) => {
+  delete require.cache[require.resolve('./data/team-data.json')];
   const teamData = require('./data/team-data.json');
   res.json(teamData);
 });

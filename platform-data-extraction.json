@@ -1,0 +1,1030 @@
+{
+  "extraction_metadata": {
+    "platform_name": "TeamPulse MindGuard AI",
+    "platform_url": "https://teampulse-mindguard-production.up.railway.app",
+    "extraction_date": "2026-01-04",
+    "company": "OpsLab",
+    "authentication": "NONE - Public access (no authentication required)",
+    "data_period": "August-December 2025",
+    "last_updated": "2025-12-31"
+  },
+  "api_endpoints": {
+    "base_url": "https://teampulse-mindguard-production.up.railway.app",
+    "endpoints": [
+      {
+        "path": "/api/team-data",
+        "method": "GET",
+        "authentication_required": false,
+        "description": "Returns monthly team data with averages and individual employee metrics for all months",
+        "response_structure": {
+          "months": [
+            {
+              "month": "number (8-11)",
+              "averages": "team average metrics",
+              "employees": "array of employee data for this month"
+            }
+          ]
+        }
+      },
+      {
+        "path": "/api/metrics",
+        "method": "GET",
+        "authentication_required": false,
+        "description": "Returns current team metrics and calculated values",
+        "response_structure": {
+          "wellbeingIndex": "number",
+          "depressionLevel": "number",
+          "anxietyLevel": "number",
+          "burnoutIndex": "number",
+          "sleepDuration": "number",
+          "sleepQuality": "number",
+          "workLifeBalance": "number",
+          "stressLevel": "number",
+          "atRiskCount": "number",
+          "criticalCount": "number"
+        }
+      },
+      {
+        "path": "/api/employee-data",
+        "method": "GET",
+        "authentication_required": false,
+        "description": "Returns complete employee data with history, alerts, recommendations, and metadata",
+        "response_structure": {
+          "company": "string",
+          "lastUpdated": "date",
+          "employees": "array",
+          "teamAverages": "object",
+          "industryBenchmarks": "object",
+          "alerts": "array",
+          "recommendations": "array",
+          "metadata": "object"
+        }
+      }
+    ]
+  },
+  "metrics_definitions": {
+    "who5": {
+      "name": "WHO-5 Well-Being Index",
+      "range": "0-100",
+      "description": "World Health Organization Well-Being Index measuring quality of life and well-being",
+      "thresholds": {
+        "critical": "< 28 (probable depression)",
+        "at_risk": "< 50 (risk of reduced well-being)",
+        "healthy": ">= 50"
+      },
+      "interpretation": "Higher is better"
+    },
+    "phq9": {
+      "name": "PHQ-9 Patient Health Questionnaire",
+      "range": "0-27",
+      "description": "Depression screening and severity measurement",
+      "thresholds": {
+        "minimal": "0-4",
+        "mild": "5-9",
+        "moderate": "10-14",
+        "moderately_severe": "15-19",
+        "severe": "20-27",
+        "at_risk": "> 10",
+        "critical": "> 15"
+      },
+      "interpretation": "Lower is better"
+    },
+    "gad7": {
+      "name": "GAD-7 Generalized Anxiety Disorder",
+      "range": "0-21",
+      "description": "Anxiety screening and severity measurement",
+      "thresholds": {
+        "minimal": "0-4",
+        "mild": "5-9",
+        "moderate": "10-14",
+        "severe": "15-21",
+        "at_risk": "> 10",
+        "critical": "> 15"
+      },
+      "interpretation": "Lower is better"
+    },
+    "mbi": {
+      "name": "MBI Maslach Burnout Inventory",
+      "range": "0-100%",
+      "description": "Burnout assessment measuring emotional exhaustion and depersonalization",
+      "thresholds": {
+        "low": "< 30%",
+        "moderate": "30-40%",
+        "high": "> 40%",
+        "at_risk": "> 35%"
+      },
+      "interpretation": "Lower is better"
+    },
+    "sleepDuration": {
+      "name": "Sleep Duration",
+      "range": "0-24 hours",
+      "description": "Average nightly sleep duration",
+      "thresholds": {
+        "insufficient": "< 6 hours",
+        "adequate": "6-8 hours",
+        "optimal": "7-9 hours"
+      },
+      "interpretation": "7-9 hours is optimal"
+    },
+    "sleepQuality": {
+      "name": "Sleep Quality",
+      "range": "0-10",
+      "description": "Self-reported sleep quality rating",
+      "thresholds": {
+        "poor": "< 5",
+        "fair": "5-6",
+        "good": "7-8",
+        "excellent": "9-10"
+      },
+      "interpretation": "Higher is better"
+    },
+    "workLifeBalance": {
+      "name": "Work-Life Balance",
+      "range": "0-10",
+      "description": "Self-reported work-life balance satisfaction",
+      "thresholds": {
+        "poor": "< 5",
+        "fair": "5-6",
+        "good": "7-8",
+        "excellent": "9-10"
+      },
+      "interpretation": "Higher is better"
+    },
+    "stressLevel": {
+      "name": "Stress Level",
+      "range": "0-40 (PSS scale)",
+      "description": "Perceived Stress Scale measurement",
+      "thresholds": {
+        "low": "0-13",
+        "moderate": "14-26",
+        "high": "27-40"
+      },
+      "interpretation": "Lower is better"
+    }
+  },
+  "risk_calculation": {
+    "at_risk_criteria": "Any of: WHO-5 < 50, PHQ-9 > 10, GAD-7 > 10, MBI > 35",
+    "critical_criteria": "Any of: WHO-5 < 28, PHQ-9 > 15, GAD-7 > 15"
+  },
+  "industry_benchmarks": {
+    "tech_sector": {
+      "who5": 58,
+      "phq9": 8,
+      "gad7": 7,
+      "mbi": 30,
+      "sleepDuration": 6.5,
+      "workLifeBalance": 5.5,
+      "stressLevel": 7
+    }
+  },
+  "available_months": [
+    "August 2025 (month: 8)",
+    "September 2025 (month: 9)",
+    "October 2025 (month: 10)",
+    "November 2025 (month: 11)",
+    "December 2025 (month: 12)"
+  ],
+  "team_summary": {
+    "total_employees": 8,
+    "active_employees": 8,
+    "participation_rate": "100%",
+    "update_frequency": "monthly",
+    "next_assessment": "2025-12-30"
+  },
+  "employees": [
+    {
+      "id": 1,
+      "code": "1122",
+      "name": "Катерина Петухова",
+      "email": "kateryna.petukhova@opslab.uk",
+      "current_metrics": {
+        "who5": 40,
+        "phq9": 16,
+        "gad7": 13,
+        "mbi": 81.5,
+        "sleepDuration": 5.3,
+        "sleepQuality": 1,
+        "workLifeBalance": 2,
+        "stressLevel": 39
+      },
+      "riskLevel": "critical",
+      "notes": "КРИТИЧНИЙ СТАН! WHO-5: 40, PHQ-9: 16, GAD-7: 13, MBI: 81.5%. Термінова психологічна допомога необхідна!",
+      "monthly_history": {
+        "august": {
+          "who5": 72,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 12
+        },
+        "september": {
+          "who5": 40,
+          "phq9": 14,
+          "gad7": 15,
+          "mbi": 33.33,
+          "sleepDuration": 6.5,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "october": {
+          "who5": 48,
+          "phq9": 14,
+          "gad7": 0,
+          "mbi": 44.44,
+          "sleepDuration": 6.3,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 15
+        },
+        "november": {
+          "who5": 48,
+          "phq9": 13,
+          "gad7": 11,
+          "mbi": 44.44,
+          "sleepDuration": 6.2,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 16
+        },
+        "december": {
+          "who5": 40,
+          "phq9": 16,
+          "gad7": 13,
+          "mbi": 81.5,
+          "sleepDuration": 5.3,
+          "sleepQuality": 1,
+          "workLifeBalance": 2,
+          "stressLevel": 39
+        }
+      }
+    },
+    {
+      "id": 2,
+      "code": "6738",
+      "name": "Іванна Сакало",
+      "email": "ivanna.sakalo@opslab.uk",
+      "current_metrics": {
+        "who5": 32,
+        "phq9": 11,
+        "gad7": 8,
+        "mbi": 68,
+        "sleepDuration": 5.7,
+        "sleepQuality": 3,
+        "workLifeBalance": 3,
+        "stressLevel": 30
+      },
+      "riskLevel": "high",
+      "notes": "КРИТИЧНЕ ПОГІРШЕННЯ в грудні! WHO-5 впав з 72 до 32. PHQ-9: 11. Негайна інтервенція потрібна.",
+      "monthly_history": {
+        "august": {
+          "who5": 60,
+          "phq9": 2,
+          "gad7": 0,
+          "mbi": 45,
+          "sleepDuration": 6.8,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 14
+        },
+        "september": {
+          "who5": 44,
+          "phq9": 7,
+          "gad7": 10,
+          "mbi": 16.67,
+          "sleepDuration": 6.5,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 16
+        },
+        "october": {
+          "who5": 36,
+          "phq9": 11,
+          "gad7": 14,
+          "mbi": 22.22,
+          "sleepDuration": 6,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "november": {
+          "who5": 72,
+          "phq9": 8,
+          "gad7": 5,
+          "mbi": 22.22,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        },
+        "december": {
+          "who5": 32,
+          "phq9": 11,
+          "gad7": 8,
+          "mbi": 68,
+          "sleepDuration": 5.7,
+          "sleepQuality": 3,
+          "workLifeBalance": 3,
+          "stressLevel": 30
+        }
+      }
+    },
+    {
+      "id": 3,
+      "code": "9267",
+      "name": "Михайло Іващук",
+      "email": "mykhailo.ivashchuk@opslab.uk",
+      "current_metrics": {
+        "who5": 56,
+        "phq9": 15,
+        "gad7": 12,
+        "mbi": 70,
+        "sleepDuration": 5.6,
+        "sleepQuality": 1,
+        "workLifeBalance": 3,
+        "stressLevel": 36
+      },
+      "riskLevel": "high",
+      "notes": "Критичний рівень вигорання 70%, PHQ-9: 15 (помірно-тяжка депресія), GAD-7: 12. Необхідна термінова підтримка.",
+      "monthly_history": {
+        "august": {
+          "who5": 52,
+          "phq9": 6,
+          "gad7": 0,
+          "mbi": 62,
+          "sleepDuration": 6.2,
+          "sleepQuality": 6,
+          "workLifeBalance": 5,
+          "stressLevel": 18
+        },
+        "september": {
+          "who5": 44,
+          "phq9": 17,
+          "gad7": 15,
+          "mbi": 50,
+          "sleepDuration": 5.8,
+          "sleepQuality": 5,
+          "workLifeBalance": 4,
+          "stressLevel": 20
+        },
+        "october": {
+          "who5": 36,
+          "phq9": 9,
+          "gad7": 14,
+          "mbi": 44.44,
+          "sleepDuration": 5.5,
+          "sleepQuality": 4,
+          "workLifeBalance": 4,
+          "stressLevel": 19
+        },
+        "november": {
+          "who5": 56,
+          "phq9": 13,
+          "gad7": 10,
+          "mbi": 44.44,
+          "sleepDuration": 6,
+          "sleepQuality": 5,
+          "workLifeBalance": 5,
+          "stressLevel": 15
+        },
+        "december": {
+          "who5": 56,
+          "phq9": 15,
+          "gad7": 12,
+          "mbi": 70,
+          "sleepDuration": 5.6,
+          "sleepQuality": 1,
+          "workLifeBalance": 3,
+          "stressLevel": 36
+        }
+      }
+    },
+    {
+      "id": 4,
+      "code": "4747",
+      "name": "Джейн Давидюк",
+      "email": "jane.davydyuk@opslab.uk",
+      "current_metrics": {
+        "who5": 90,
+        "phq9": 3,
+        "gad7": 8,
+        "mbi": 11.11,
+        "sleepDuration": 7.8,
+        "sleepQuality": 8,
+        "workLifeBalance": 8,
+        "stressLevel": 5
+      },
+      "riskLevel": "low",
+      "notes": "Відмінні показники психічного здоров'я. Еталонний work-life баланс. Новий співробітник з вересня.",
+      "monthly_history": {
+        "august": {
+          "who5": 0,
+          "phq9": 0,
+          "gad7": 0,
+          "mbi": 0,
+          "sleepDuration": 0,
+          "sleepQuality": 0,
+          "workLifeBalance": 0,
+          "stressLevel": 0
+        },
+        "september": {
+          "who5": 88,
+          "phq9": 2,
+          "gad7": 4,
+          "mbi": 5.56,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 4
+        },
+        "october": {
+          "who5": 88,
+          "phq9": 3,
+          "gad7": 9,
+          "mbi": 11.11,
+          "sleepDuration": 7.7,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 5
+        },
+        "november": {
+          "who5": 90,
+          "phq9": 3,
+          "gad7": 8,
+          "mbi": 11.11,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 5
+        }
+      }
+    },
+    {
+      "id": 5,
+      "code": "8463",
+      "name": "Оксана Клінчаян",
+      "email": "oksana.klinchaian@opslab.uk",
+      "current_metrics": {
+        "who5": 76,
+        "phq9": 7,
+        "gad7": 7,
+        "mbi": 36.5,
+        "sleepDuration": 6.6,
+        "sleepQuality": 5,
+        "workLifeBalance": 6,
+        "stressLevel": 21
+      },
+      "riskLevel": "high",
+      "notes": "Відмінне покращення в грудні! WHO-5: 76 (з 60), PHQ-9: 7 (з 11). Позитивна динаміка!",
+      "monthly_history": {
+        "august": {
+          "who5": 72,
+          "phq9": 2,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        },
+        "september": {
+          "who5": 64,
+          "phq9": 3,
+          "gad7": 4,
+          "mbi": 33.33,
+          "sleepDuration": 7,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 11
+        },
+        "october": {
+          "who5": 72,
+          "phq9": 5,
+          "gad7": 4,
+          "mbi": 27.78,
+          "sleepDuration": 7.2,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 11,
+          "gad7": 8,
+          "mbi": 27.78,
+          "sleepDuration": 6.8,
+          "sleepQuality": 6,
+          "workLifeBalance": 6,
+          "stressLevel": 12
+        },
+        "december": {
+          "who5": 76,
+          "phq9": 7,
+          "gad7": 7,
+          "mbi": 36.5,
+          "sleepDuration": 6.6,
+          "sleepQuality": 5,
+          "workLifeBalance": 6,
+          "stressLevel": 21
+        }
+      }
+    },
+    {
+      "id": 6,
+      "code": "3814",
+      "name": "Ірина М'ячкова",
+      "email": "iryna.miachkova@opslab.uk",
+      "current_metrics": {
+        "who5": 84,
+        "phq9": 6,
+        "gad7": 7,
+        "mbi": 30.5,
+        "sleepDuration": 6.7,
+        "sleepQuality": 5,
+        "workLifeBalance": 6,
+        "stressLevel": 20
+      },
+      "riskLevel": "low",
+      "notes": "Дуже сильне покращення! WHO-5: 84 (з 60). Стабільні показники, відмінна динаміка.",
+      "monthly_history": {
+        "august": {
+          "who5": 72,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 40,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "september": {
+          "who5": 68,
+          "phq9": 4,
+          "gad7": 5,
+          "mbi": 11.11,
+          "sleepDuration": 7.3,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "october": {
+          "who5": 80,
+          "phq9": 7,
+          "gad7": 8,
+          "mbi": 16.67,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 9
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 7,
+          "gad7": 7,
+          "mbi": 16.67,
+          "sleepDuration": 7,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 9
+        },
+        "december": {
+          "who5": 84,
+          "phq9": 6,
+          "gad7": 7,
+          "mbi": 30.5,
+          "sleepDuration": 6.7,
+          "sleepQuality": 5,
+          "workLifeBalance": 6,
+          "stressLevel": 20
+        }
+      }
+    },
+    {
+      "id": 7,
+      "code": "4582",
+      "name": "Вероніка Кухарчук",
+      "email": "veronika.kukharchuk@opslab.uk",
+      "current_metrics": {
+        "who5": 88,
+        "phq9": 3,
+        "gad7": 3,
+        "mbi": 16.5,
+        "sleepDuration": 7.1,
+        "sleepQuality": 7,
+        "workLifeBalance": 7,
+        "stressLevel": 12
+      },
+      "riskLevel": "low",
+      "notes": "Стабільно відмінні показники! WHO-5: 88, PHQ-9: 3. Зниження MBI до 16.5%. Чудовий стан!",
+      "monthly_history": {
+        "august": {
+          "who5": 92,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 30,
+          "sleepDuration": 7.8,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 6
+        },
+        "september": {
+          "who5": 60,
+          "phq9": 4,
+          "gad7": 8,
+          "mbi": 38.89,
+          "sleepDuration": 7,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 9
+        },
+        "october": {
+          "who5": 48,
+          "phq9": 7,
+          "gad7": 5,
+          "mbi": 38.89,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 8
+        },
+        "november": {
+          "who5": 88,
+          "phq9": 6,
+          "gad7": 3,
+          "mbi": 38.89,
+          "sleepDuration": 7.5,
+          "sleepQuality": 8,
+          "workLifeBalance": 8,
+          "stressLevel": 7
+        },
+        "december": {
+          "who5": 88,
+          "phq9": 3,
+          "gad7": 3,
+          "mbi": 16.5,
+          "sleepDuration": 7.1,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 12
+        }
+      }
+    },
+    {
+      "id": 8,
+      "code": "1425",
+      "name": "Марія Василик",
+      "email": "mariya.vasylyk@opslab.uk",
+      "current_metrics": {
+        "who5": 64,
+        "phq9": 3,
+        "gad7": 3,
+        "mbi": 28.5,
+        "sleepDuration": 6.8,
+        "sleepQuality": 7,
+        "workLifeBalance": 6,
+        "stressLevel": 15
+      },
+      "riskLevel": "low",
+      "notes": "Стабільні показники, WHO-5: 64. Невелике покращення порівняно з листопадом.",
+      "monthly_history": {
+        "august": {
+          "who5": 60,
+          "phq9": 1,
+          "gad7": 0,
+          "mbi": 45,
+          "sleepDuration": 7,
+          "sleepQuality": 7,
+          "workLifeBalance": 7,
+          "stressLevel": 10
+        },
+        "september": {
+          "who5": 64,
+          "phq9": 4,
+          "gad7": 2,
+          "mbi": 33.33,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 9
+        },
+        "october": {
+          "who5": 52,
+          "phq9": 3,
+          "gad7": 3,
+          "mbi": 27.78,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 7
+        },
+        "november": {
+          "who5": 60,
+          "phq9": 5,
+          "gad7": 5,
+          "mbi": 27.78,
+          "sleepDuration": 7,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 8
+        },
+        "december": {
+          "who5": 64,
+          "phq9": 3,
+          "gad7": 3,
+          "mbi": 28.5,
+          "sleepDuration": 6.8,
+          "sleepQuality": 7,
+          "workLifeBalance": 6,
+          "stressLevel": 15
+        }
+      }
+    }
+  ],
+  "team_averages_by_month": {
+    "current": {
+      "who5": 65.5,
+      "phq9": 8.25,
+      "gad7": 7.38,
+      "mbi": 44.81,
+      "sleepDuration": 6.33,
+      "sleepQuality": 4.25,
+      "workLifeBalance": 4.88,
+      "stressLevel": 23.88
+    },
+    "august": {
+      "who5": 68.1,
+      "phq9": 2.8,
+      "gad7": 0,
+      "mbi": 46.1,
+      "sleepDuration": 6.85,
+      "sleepQuality": 6.7,
+      "workLifeBalance": 6.6,
+      "stressLevel": 20.6
+    },
+    "september": {
+      "who5": 57.82,
+      "phq9": 6.73,
+      "gad7": 8,
+      "mbi": 33.56,
+      "sleepDuration": 6.86,
+      "sleepQuality": 6.45,
+      "workLifeBalance": 5.55,
+      "stressLevel": 17.73
+    },
+    "october": {
+      "who5": 57.5,
+      "phq9": 7.38,
+      "gad7": 7.12,
+      "mbi": 29.17,
+      "sleepDuration": 6.66,
+      "sleepQuality": 6.5,
+      "workLifeBalance": 6.375,
+      "stressLevel": 9.625
+    },
+    "november": {
+      "who5": 66.75,
+      "phq9": 8.25,
+      "gad7": 7.125,
+      "mbi": 29.19,
+      "sleepDuration": 7.06,
+      "sleepQuality": 6.625,
+      "workLifeBalance": 6.5,
+      "stressLevel": 10.25
+    },
+    "december": {
+      "who5": 65.5,
+      "phq9": 8.25,
+      "gad7": 7.38,
+      "mbi": 44.81,
+      "sleepDuration": 6.33,
+      "sleepQuality": 4.25,
+      "workLifeBalance": 4.88,
+      "stressLevel": 23.88
+    }
+  },
+  "current_team_metrics": {
+    "wellbeingIndex": 65.5,
+    "depressionLevel": 8.25,
+    "anxietyLevel": 7.38,
+    "burnoutIndex": 44.81,
+    "sleepDuration": 6.33,
+    "sleepQuality": 4.25,
+    "workLifeBalance": 4.88,
+    "stressLevel": 23.88,
+    "atRiskCount": 4,
+    "criticalCount": 1
+  },
+  "alerts": [
+    {
+      "severity": "critical",
+      "employee": "Катерина Петухова",
+      "message": "КРИТИЧНИЙ СТАН! WHO-5: 40, PHQ-9: 16 (помірно-тяжка депресія), MBI: 81.5%. Негайна психологічна допомога!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    },
+    {
+      "severity": "critical",
+      "employee": "Іванна Сакало",
+      "message": "КРИТИЧНЕ ПОГІРШЕННЯ! WHO-5 впав з 72 (листопад) до 32 (грудень). PHQ-9: 11. Негайна інтервенція!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    },
+    {
+      "severity": "critical",
+      "employee": "Михайло Іващук",
+      "message": "Критичний рівень вигорання 70%, PHQ-9: 15 (помірно-тяжка депресія). Негайна підтримка!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    },
+    {
+      "severity": "positive",
+      "employee": "Оксана Клінчаян",
+      "message": "Відмінне покращення в грудні! WHO-5: 76 (+16 від листопада), PHQ-9: 7 (з 11). Позитивна динаміка!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    },
+    {
+      "severity": "positive",
+      "employee": "Ірина М'ячкова",
+      "message": "Дуже сильне покращення! WHO-5: 84 (+24 від листопада). Відмінна динаміка відновлення!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    },
+    {
+      "severity": "positive",
+      "employee": "Вероніка Кухарчук",
+      "message": "Стабільно відмінні показники! WHO-5: 88, MBI знизився до 16.5%. Зразковий стан!",
+      "timestamp": "2025-12-31T10:00:00Z"
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "emergency",
+      "title": "ТЕРМІНОВА психологічна інтервенція",
+      "description": "3 співробітників в критичному стані (Катерина, Іванна, Михайло) потребують НЕГАЙНОЇ професійної психологічної допомоги",
+      "affectedEmployees": [
+        "Катерина Петухова",
+        "Іванна Сакало",
+        "Михайло Іващук"
+      ],
+      "priority": "critical"
+    },
+    {
+      "category": "urgent",
+      "title": "Зменшення робочого навантаження",
+      "description": "Для співробітників в критичному стані необхідно негайно перерозподілити задачі та надати відпустку",
+      "affectedEmployees": [
+        "Катерина Петухова",
+        "Іванна Сакало",
+        "Михайло Іващук"
+      ],
+      "priority": "critical"
+    },
+    {
+      "category": "positive",
+      "title": "Аналіз успішних практик відновлення",
+      "description": "Вивчити фактори успіху Оксани, Ірини та Вероніки для застосування в команді",
+      "affectedEmployees": [
+        "Оксана Клінчаян",
+        "Ірина М'ячкова",
+        "Вероніка Кухарчук"
+      ],
+      "priority": "high"
+    },
+    {
+      "category": "general",
+      "title": "Організаційні зміни",
+      "description": "Критично високий рівень вигорання команди (44.81%) вимагає системних змін в організації роботи",
+      "affectedEmployees": [
+        "all"
+      ],
+      "priority": "critical"
+    }
+  ],
+  "one_on_one_playbooks": [
+    {
+      "employee": "Катерина Петухова",
+      "riskLevel": "high",
+      "alert": "PHQ-9: 13/27, Стрес: високий",
+      "conversation_script": {
+        "opening": "Катю, дякую, що знайшла час. Хочу поговорити про твоє самопочуття - це важливо для мене. Я помітив деякі сигнали в метриках і хочу переконатися, що ти отримуєш потрібну підтримку.",
+        "questions": [
+          "Як ти себе почуваєш останнім часом? Що найбільше турбує?",
+          "Які завдання/проєкти зараз забирають найбільше енергії?",
+          "Як твій сон? Чи вистачає часу на відновлення?",
+          "Що б допомогло тобі почуватися краще на роботі?"
+        ],
+        "active_listening_tips": "Не перебивати, робити паузи 3-5 секунд після відповідей, підтверджувати почуте",
+        "closing": "Дякую за відкритість. Давай разом складемо конкретний план на тиждень і зустрінемось знову через 7 днів."
+      },
+      "7_day_action_plan": {
+        "day_1_2": "Делегувати 1 не-критичну задачу колезі. Призначити консультацію з психологом/коучем (конкретна дата і час). Надіслати запрошення в календар.",
+        "day_3_4": "Скасувати або скоротити 2 найменш продуктивних мітинги. Додати в календар 2 блоки по 2 години 'Deep Work' без пінгів і повідомлень.",
+        "day_5_7": "Короткий check-in (5 хв): 'Як відчуваєш зміни? Що працює, що треба скоригувати?' Заборона робочих чатів після 19:00 (домовленість з командою)."
+      },
+      "follow_up_questions": [
+        "Наскільки змінилося твоє самопочуття за шкалою 1-10?",
+        "Які з запропонованих змін найбільше допомогли?",
+        "Що ще потрібно скоригувати на наступний тиждень?",
+        "Чи вистачає тобі енергії наприкінці дня? Як змінився сон?"
+      ]
+    },
+    {
+      "employee": "Михайло Іващук",
+      "riskLevel": "high",
+      "alert": "PHQ-9: 13/27, GAD-7: 10/21",
+      "conversation_script": {
+        "opening": "Михайле, дякую, що знайшов час. Помітив, що рівень тривожності підвищився - хочу зрозуміти, як тобі допомогти.",
+        "questions": [
+          "Що найбільше викликає занепокоєння останнім часом?",
+          "Чи є конкретні робочі ситуації, які підвищують стрес?",
+          "Як ти зараз справляєшся з тривожністю? Що допомагає?",
+          "Що б зменшило невизначеність або тиск на роботі?"
+        ],
+        "active_listening_tips": "Валідувати емоції ('Це абсолютно нормально відчувати...'), не давати порад одразу, дозволити висловитися повністю",
+        "closing": "Ми разом з цим впораємось. Давай впровадимо кілька технік і зустрінемось через тиждень."
+      },
+      "7_day_action_plan": {
+        "day_1_2": "Навчити техніці 4-7-8 дихання (4 сек вдих, 7 сек затримка, 8 сек видих). Практикувати 3 рази на день по 2 хвилини. Створити приоритезований список задач на тиждень разом.",
+        "day_3_4": "Запровадити гнучкий графік: можливість починати роботу на 1-2 години пізніше, якщо потрібно. Призначити buddy з команди для щоденних 5-хв check-in'ів підтримки.",
+        "day_5_7": "Короткий check-in: 'Як працюють дихальні вправи? Чи зменшилась тривожність?' Обговорити можливість консультації з терапевтом (CBT для тривожності)."
+      },
+      "follow_up_questions": [
+        "Як часто виникають моменти сильної тривожності?",
+        "Чи допомагає дихальна техніка? В яких ситуаціях використовуєш?",
+        "Чи є ясність по задачах і пріоритетах зараз?",
+        "Що ще викликає занепокоєння, про що ми не поговорили?"
+      ]
+    },
+    {
+      "employee": "Оксана Клінчаян",
+      "riskLevel": "medium",
+      "alert": "PHQ-9: 11/27, негативна динаміка",
+      "conversation_script": {
+        "opening": "Оксано, дякую за час. Помітив зміни в показниках благополуччя і хочу поговорити - що змінилось останнім часом?",
+        "questions": [
+          "Що змінилось в останні тижні? Які події вплинули на самопочуття?",
+          "На якому рівні зараз енергія і мотивація?",
+          "Які конкретні робочі моменти зараз найбільше виснажують?",
+          "Яка підтримка була б найбільш корисною зараз?"
+        ],
+        "active_listening_tips": "Не мінімізувати проблеми, запитувати уточнюючі питання, показати емпатію",
+        "closing": "Важливо зупинити погіршення зараз. Давай впровадимо зміни і контролюватимемо стан щотижня."
+      },
+      "7_day_action_plan": {
+        "day_1_2": "Провести аудит робочого навантаження: виписати всі поточні задачі, позначити пріоритети (Must/Should/Could). Заморозити 2 найменш пріоритетні задачі до наступного спринту.",
+        "day_3_4": "Запропонувати 1 ментальний день здоров'я (Mental Health Day) для відновлення. Підключити peer support - призначити ментора з команди з хорошим work-life balance для обміну практиками.",
+        "day_5_7": "Check-in: 'Як вплинув день відновлення? Чи відчуваєш різницю після перерозподілу задач?' Разом визначити 1-2 практики для підтримки енергії."
+      },
+      "follow_up_questions": [
+        "Як змінився рівень енергії на шкалі 1-10?",
+        "Чи допоміг mental health day? Що робила, що найбільше відновило?",
+        "Які практики від ментора хочеш спробувати?",
+        "Чи відчуваєш, що навантаження зараз керованіше?"
+      ]
+    }
+  ],
+  "dashboard_features": {
+    "main_dashboard": [
+      "Team Health Score visualization",
+      "Monthly team averages trends",
+      "Individual employee metrics cards",
+      "Risk alerts and notifications",
+      "Industry benchmarking comparisons",
+      "Employee table with monthly data toggle"
+    ],
+    "advanced_analytics": [
+      "Team Health Score calculation (weighted composite metric)",
+      "Industry Benchmarking (comparison with tech sector standards)",
+      "Trajectory Analysis (trend visualization over 4 months)",
+      "Risk Matrix (stress vs burnout scatter plot with PHQ-9 as radius)",
+      "Correlation Heatmap (metric interdependencies)",
+      "Distribution Analysis (metric distribution across team)",
+      "Time Series Trends (all metrics over time)",
+      "1:1 Playbooks with conversation scripts and action plans",
+      "Personalized AI-generated recommendations",
+      "Detailed metric tooltips and interpretations"
+    ]
+  },
+  "platform_features": {
+    "assessment_tools": [
+      "WHO-5 Well-Being Index (0-100)",
+      "PHQ-9 Patient Health Questionnaire (0-27)",
+      "GAD-7 Generalized Anxiety Disorder (0-21)",
+      "MBI Maslach Burnout Inventory (0-100%)"
+    ],
+    "ai_capabilities": [
+      "Automatic risk detection and alerting",
+      "Trend analysis and forecasting",
+      "Personalized recommendation generation",
+      "Correlation analysis between metrics",
+      "Employee trajectory tracking",
+      "Industry benchmarking"
+    ],
+    "reporting": [
+      "Monthly team reports",
+      "Individual employee progress tracking",
+      "Historical trend analysis (August-November 2025)",
+      "Risk categorization (low/medium/high)",
+      "Alert system (high/medium/positive severity levels)"
+    ]
+  }
+}
