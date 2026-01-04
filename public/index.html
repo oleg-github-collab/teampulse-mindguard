@@ -788,18 +788,52 @@
             observer.observe(section);
         });
 
-        // Form handling
-        document.getElementById('contactForm').addEventListener('submit', (e) => {
+        // Form handling with Google Apps Script integration
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Відправка...';
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
 
-            console.log('Form submitted:', data);
+            try {
+                // ВАЖЛИВО: Замініть цей URL на ваш URL розгортання з Apps Script
+                const APPS_SCRIPT_URL = 'YOUR_DEPLOYMENT_URL_HERE';
 
-            // Show success message
-            alert('Дякуємо! Ваша заявка отримана. Ми зв\'яжемося з вами найближчим часом.');
-            e.target.reset();
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Important for Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // При no-cors ми не можемо читати response, тому вважаємо успішним
+                console.log('Form submitted:', data);
+
+                // Show success message
+                alert('✅ Дякуємо! Ваша заявка отримана.\n\nМи зв\'яжемося з вами найближчим часом.\nОчікуйте email з підтвердженням.');
+                e.target.reset();
+
+                // Перенаправлення на демо через 2 секунди
+                setTimeout(() => {
+                    if (confirm('Бажаєте переглянути демо-версію платформи?')) {
+                        window.location.href = '/dashboard.html';
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('❌ Помилка відправки форми.\n\nБудь ласка, спробуйте пізніше або зв\'яжіться з нами за email: work.olegkaminskyi@gmail.com');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
         });
 
         // Smooth scrolling
